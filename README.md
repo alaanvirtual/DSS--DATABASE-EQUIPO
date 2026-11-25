@@ -24,6 +24,14 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 ## 📂 Estructura del Repositorio
 
 ```text
+├── backend/                  # Plantilla Node.js + Express lista para conectar a TiDB Cloud y Render
+│   ├── src/
+│   │   ├── index.js          # Servidor Express y rutas base
+│   │   ├── db.js             # Pool de conexión MySQL con SSL
+│   │   └── routes/           # Endpoints de prueba (/api/health, /api/proyectos)
+│   ├── .env.example          # Variables de entorno requeridas
+│   ├── package.json          # Dependencias y scripts de arranque
+│   └── README.md             # Guía de despliegue paso a paso en Render
 ├── sql/
 │   ├── 01_schema.sql         # DDL: Creación de BD y las 15 tablas relacionales con PK/FK
 │   ├── 02_seed.sql           # DML: Datos iniciales de prueba (Proyecto "Laptops", usuarios, herramientas)
