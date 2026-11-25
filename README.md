@@ -24,20 +24,27 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 ## 📂 Estructura del Repositorio
 
 ```text
-├── backend/                  # Plantilla Node.js + Express lista para conectar a TiDB Cloud y Render
+├── backend/                  # API REST en TypeScript + Express + Drizzle ORM
 │   ├── src/
-│   │   ├── index.js          # Servidor Express y rutas base
-│   │   ├── db.js             # Pool de conexión MySQL con SSL
-│   │   └── routes/           # Endpoints de prueba (/api/health, /api/proyectos)
+│   │   ├── index.ts          # Servidor Express y montaje de routers
+│   │   ├── db/
+│   │   │   ├── schema.ts     # Las 15 tablas como esquema Drizzle
+│   │   │   └── client.ts     # Pool mysql2 + conexión Drizzle
+│   │   ├── crud/             # Factory CRUD reutilizable
+│   │   ├── routes/           # Routers por entidad + scoring
+│   │   └── schemas/          # Validación de entrada con Zod
 │   ├── .env.example          # Variables de entorno requeridas
-│   ├── package.json          # Dependencias y scripts de arranque
-│   └── README.md             # Guía de despliegue paso a paso en Render
+│   ├── package.json          # Dependencias y scripts (dev/build/start)
+│   └── README.md             # Documentación de la API y despliegue en Render
 ├── sql/
 │   ├── 01_schema.sql         # DDL: Creación de BD y las 15 tablas relacionales con PK/FK
 │   ├── 02_seed.sql           # DML: Datos iniciales de prueba (Proyecto "Laptops", usuarios, herramientas)
 │   └── 03_consultas_dss.sql  # DQL: Consultas de verificación, auditoría y cálculo de Scoring final
 └── README.md                 # Documentación técnica de arquitectura y guía de despliegue
 ```
+
+> La API expone CRUD completo (`GET`, `POST`, `PATCH`, `DELETE`) para las 15 tablas.
+> Consulta [`backend/README.md`](backend/README.md) para el listado de endpoints.
 
 ---
 
