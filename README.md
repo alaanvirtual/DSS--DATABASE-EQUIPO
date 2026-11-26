@@ -4,7 +4,7 @@ Persistencia relacional en **MySQL 8.0+** diseñada para respaldar la arquitectu
 
 ---
 
-## 📌 Contexto del Proyecto y Dominio del Problema
+## Contexto del Proyecto y Dominio del Problema
 
 Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo colaborativo distribuido y asíncrono diseñada para resolver problemas de decisión complejos (como la selección de una franquicia comercial, compra de equipo o localización de proyectos), mediante la integración de:
 1. **Roles colaborativos diferenciados**:
@@ -21,7 +21,7 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 
 ---
 
-## 📂 Estructura del Repositorio
+## Estructura del Repositorio
 
 ```text
 ├── backend/                  # API REST en TypeScript + Express + Drizzle ORM
@@ -36,6 +36,34 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 │   ├── .env.example          # Variables de entorno requeridas
 │   ├── package.json          # Dependencias y scripts (dev/build/start)
 │   └── README.md             # Documentación de la API y despliegue en Render
+├── Frontend/                 # Cliente Angular 20 (zoneless) con pnpm y Phosphor Icons
+│   ├── angular.json          # Configuración del proyecto (incluye los estilos de Phosphor)
+│   ├── package.json          # Dependencias y scripts (start/build/test)
+│   ├── public/               # Recursos estáticos (favicon)
+│   └── src/
+│       ├── index.html
+│       ├── main.ts           # Arranque de la aplicación
+│       ├── styles.css        # Importa los tokens y la base de app/styles
+│       └── app/
+│           ├── app.ts        # Componente raíz (encabezado, router-outlet y notificaciones)
+│           ├── app.html
+│           ├── app.css
+│           ├── app.config.ts # Proveedores: router, HttpClient e interceptores
+│           ├── app.routes.ts # Rutas con carga diferida por vista
+│           ├── auth/
+│           │   ├── environment/   # environment.ts (apiUrl del backend)
+│           │   └── interceptors/  # error-api.interceptor.ts
+│           ├── components/
+│           │   ├── secundarios/   # Atomos: icono, boton, insignia, estado-vacio, cargando, campo-select, campo-texto
+│           │   ├── compuestos/    # tarjeta-idea, columna-categoria
+│           │   ├── modales/       # modal, modal-confirmar, modal-nombre
+│           │   └── principales/   # encabezado, notificaciones, barra-contexto, tablero-categorizador
+│           ├── models/            # Interfaces de las entidades (planas, un archivo por entidad)
+│           ├── services/          # Acceso a la API y estado de cada herramienta (planos)
+│           ├── styles/            # tokens.css (paleta) y base.css
+│           ├── utils/             # Funciones puras de apoyo (con sus pruebas)
+│           └── views/
+│               └── categorizador/ # Vista de la ruta /categorizador
 ├── sql/
 │   ├── 01_schema.sql         # DDL: Creación de BD y las 14 tablas relacionales con PK/FK
 │   ├── 02_seed.sql           # DML: Datos iniciales de prueba (Proyecto "Laptops", usuarios, herramientas)
@@ -48,7 +76,49 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 
 ---
 
-## 🗄️ Modelo de Datos (14 Tablas Relacionales)
+## Frontend (Angular)
+
+Cliente web del sistema, construido con **Angular 20 (zoneless)**, **pnpm** y **Phosphor Icons**.
+Por ahora implementa la herramienta **Categorizador** (herramienta 3 del SADMG); los demás
+módulos los desarrollan otros equipos reutilizando los mismos componentes.
+
+### Categorizador
+
+El **facilitador (`FAC`)** organiza las ideas de la lluvia de ideas del tópico anterior en categorías:
+
+* Lista de *ideas sin categorizar* y columnas de categorías, con arrastrar y soltar (o selector "Mover a…").
+* Crear, renombrar y eliminar categorías (eliminar borra en cascada asignaciones, comentarios y votos).
+* Los **decisores (`DEC`)** lo ven en solo lectura.
+* Ruta: `/categorizador`.
+
+### Ejecución local
+
+Requiere **Node.js 24.15+** (o 22.22+) y **pnpm**. Con el backend ya corriendo:
+
+```bash
+cd Frontend
+pnpm install
+pnpm start        # http://localhost:4200
+```
+
+La URL de la API se configura en `Frontend/src/app/auth/environment/environment.ts`
+(`apiUrl`); ajústala al puerto en que corre tu backend.
+
+| Script | Descripción |
+| --- | --- |
+| `pnpm start` | Servidor de desarrollo con recarga automática |
+| `pnpm build` | Compilación de producción en `Frontend/dist/` |
+| `pnpm test` | Pruebas unitarias (Karma + Jasmine) |
+
+### Convenciones
+
+* Colores y espaciados **solo** mediante las variables de `styles/tokens.css`.
+* `models/` y `services/` son planos, sin subcarpetas.
+* Se prioriza la reutilización de componentes; antes de crear uno nuevo, revisa `components/`.
+
+---
+
+## Modelo de Datos (14 Tablas Relacionales)
 
 ### 1. Núcleo del Sistema y Control de Acceso
 * **`usuarios`**: Datos de los participantes (`id`, `nombre`, `telefono`, `correo`, `usuario`, `passw`).
@@ -83,7 +153,7 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 
 ---
 
-## ⚡ Reglas de Integridad y Diseño Relacional
+## Reglas de Integridad y Diseño Relacional
 
 * **Claves Primarias Compuestas**: Todas las tablas dependientes de un proyecto (`alternativas`, `criterios`, `agenda`, `matriz_valuada`, etc.) utilizan llaves compuestas `(idproy, ...)` para aislar completamente los datos de cada sesión y proyecto.
 * **Integridad Referencial en Cascada**: Las restricciones `FOREIGN KEY` implementan `ON DELETE CASCADE ON UPDATE CASCADE`, asegurando que la eliminación o modificación de un proyecto o usuario limpie y sincronice sus registros hijos sin inconsistencias.
@@ -91,7 +161,7 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 
 ---
 
-## 🚀 Guía de Ejecución en MySQL / MariaDB
+## Guía de Ejecución en MySQL / MariaDB
 
 ### Opción A: Desde PowerShell / Bash en una sola línea
 
@@ -114,7 +184,7 @@ SOURCE sql/03_consultas_dss.sql;
 
 ---
 
-## 📊 Consulta Destacada: Cálculo del Ranking Multicriterio (Scoring)
+## Consulta Destacada: Cálculo del Ranking Multicriterio (Scoring)
 
 El archivo [`sql/03_consultas_dss.sql`](sql/03_consultas_dss.sql) incluye el cálculo automático del modelo aditivo ponderado:
 
