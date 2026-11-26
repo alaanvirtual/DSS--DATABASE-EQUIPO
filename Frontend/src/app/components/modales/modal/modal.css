@@ -1,0 +1,43 @@
+.modal__fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--espacio-4);
+  background: rgb(31 37 51 / 55%);
+}
+
+.modal {
+  width: min(28rem, 100%);
+  background: var(--color-superficie);
+  border-radius: var(--radio-m);
+  box-shadow: var(--sombra-m);
+}
+
+.modal__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: var(--espacio-4) var(--espacio-4) 0 var(--espacio-5);
+}
+
+.modal__titulo {
+  font-size: 1.15rem;
+  color: var(--color-primario);
+}
+
+.modal__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  padding: var(--espacio-4) var(--espacio-5);
+}
+
+.modal__pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espacio-2);
+  padding: 0 var(--espacio-5) var(--espacio-5);
+}

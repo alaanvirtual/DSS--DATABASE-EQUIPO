@@ -1,0 +1,15 @@
+<div class="modal__fondo" (click)="cerrar.emit()">
+  <section class="modal" role="dialog" aria-modal="true" [attr.aria-label]="titulo()"
+    (click)="$event.stopPropagation()">
+    <header class="modal__cabecera">
+      <h2 class="modal__titulo">{{ titulo() }}</h2>
+      <app-boton variante="fantasma" icono="x" [soloIcono]="true" etiquetaAria="Cerrar" (click)="cerrar.emit()" />
+    </header>
+    <div class="modal__cuerpo">
+      <ng-content />
+    </div>
+    <footer class="modal__pie">
+      <ng-content select="[pie]" />
+    </footer>
+  </section>
+</div>

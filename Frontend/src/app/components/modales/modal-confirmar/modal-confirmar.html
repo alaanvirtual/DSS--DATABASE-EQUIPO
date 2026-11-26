@@ -1,0 +1,9 @@
+<app-modal [titulo]="titulo()" (cerrar)="cancelar.emit()">
+  <p>{{ mensaje() }}</p>
+  <div pie>
+    <app-boton variante="fantasma" (click)="cancelar.emit()">Cancelar</app-boton>
+    <app-boton [variante]="peligro() ? 'peligro' : 'primario'" (click)="confirmar.emit()">
+      {{ textoConfirmar() }}
+    </app-boton>
+  </div>
+</app-modal>
