@@ -1,0 +1,3 @@
+/* Estilos globales. Los tokens y la base viven en src/app/styles. */
+@import './app/styles/tokens.css';
+@import './app/styles/base.css';
