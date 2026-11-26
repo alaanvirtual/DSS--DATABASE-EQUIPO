@@ -1,0 +1,26 @@
+<section class="columna" [class.columna--encima]="encima()" (dragover)="alArrastrarSobre($event)"
+  (dragleave)="alSalir($event)" (drop)="alSoltar($event)">
+  <header class="columna__cabecera">
+    <h3 class="columna__titulo">{{ columna().categoria.nombre }}</h3>
+    <app-insignia variante="primario">{{ columna().ideas.length }}</app-insignia>
+    @if (editable()) {
+    <span class="columna__acciones">
+      <app-boton variante="fantasma" icono="pencil-simple" [soloIcono]="true" etiquetaAria="Renombrar categoría"
+        (click)="renombrar.emit()" />
+      <app-boton variante="fantasma" icono="trash" [soloIcono]="true" etiquetaAria="Eliminar categoría"
+        (click)="eliminar.emit()" />
+    </span>
+    }
+  </header>
+
+  <div class="columna__ideas">
+    @for (idea of columna().ideas; track claveIdea(idea)) {
+    <app-tarjeta-idea variante="compacta" [idea]="idea" [editable]="editable()"
+      [categoriaOrigen]="columna().categoria.id" (quitar)="quitarIdea.emit(idea)" />
+    } @empty {
+    <p class="columna__vacia">
+      {{ editable() ? 'Arrastra ideas aquí' : 'Sin ideas todavía' }}
+    </p>
+    }
+  </div>
+</section>

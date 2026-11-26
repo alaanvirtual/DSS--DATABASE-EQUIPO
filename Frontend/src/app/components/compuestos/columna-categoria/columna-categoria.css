@@ -1,0 +1,51 @@
+:host {
+  display: block;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  height: 100%;
+  padding: var(--espacio-3);
+  background: var(--color-primario-suave);
+  border: 2px dashed transparent;
+  border-radius: var(--radio-m);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.columna--encima {
+  border-color: var(--color-primario);
+  background: #e4d6f1;
+}
+
+.columna__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.columna__titulo {
+  flex: 1;
+  font-size: 1rem;
+  color: var(--color-primario-oscuro);
+  overflow-wrap: anywhere;
+}
+
+.columna__acciones {
+  display: inline-flex;
+}
+
+.columna__ideas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  min-height: 3rem;
+}
+
+.columna__vacia {
+  padding: var(--espacio-3);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+}

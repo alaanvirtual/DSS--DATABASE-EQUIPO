@@ -1,0 +1,26 @@
+@if (variante() === 'completa') {
+<article class="idea idea--completa">
+  <header class="idea__cabecera">
+    <strong class="idea__nombre">{{ idea().nombre }}</strong>
+    <app-insignia variante="info">
+      <app-icono nombre="user" /> {{ idea().autor }}
+    </app-insignia>
+  </header>
+  @if (idea().objetivo; as detalle) {
+  <p class="idea__detalle">{{ detalle }}</p>
+  }
+  @if (editable() && destinos().length > 0) {
+  <app-campo-select etiqueta="Mover a categoría" [ocultarEtiqueta]="true" marcador="Mover a…" [opciones]="destinos()"
+    (valorChange)="alMover($event)" />
+  }
+</article>
+} @else {
+<div class="idea idea--compacta">
+  <span class="idea__nombre">{{ idea().nombre }}</span>
+  <span class="idea__autor">{{ idea().autor }}</span>
+  @if (editable()) {
+  <app-boton variante="fantasma" icono="x" [soloIcono]="true" etiquetaAria="Quitar de la categoría"
+    (click)="quitar.emit()" />
+  }
+</div>
+}
