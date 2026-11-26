@@ -49,15 +49,6 @@ export const criterioCreate = z.object({
 
 export const criterioUpdate = criterioCreate.partial().omit({ id: true });
 
-export const criterioPesoCreate = z.object({
-  id: id,
-  nombre: z.string().min(1).max(100),
-  descripcion: z.string().max(1000).nullish(),
-  peso: z.coerce.number().finite()
-});
-
-export const criterioPesoUpdate = criterioPesoCreate.partial().omit({ id: true });
-
 export const matrizCreate = z.object({
   idalt: id,
   idcrit: id,

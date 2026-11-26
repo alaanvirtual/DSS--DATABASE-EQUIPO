@@ -28,7 +28,7 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 │   ├── src/
 │   │   ├── index.ts          # Servidor Express y montaje de routers
 │   │   ├── db/
-│   │   │   ├── schema.ts     # Las 15 tablas como esquema Drizzle
+│   │   │   ├── schema.ts     # Las 14 tablas como esquema Drizzle
 │   │   │   └── client.ts     # Pool mysql2 + conexión Drizzle
 │   │   ├── crud/             # Factory CRUD reutilizable
 │   │   ├── routes/           # Routers por entidad + scoring
@@ -37,18 +37,18 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 │   ├── package.json          # Dependencias y scripts (dev/build/start)
 │   └── README.md             # Documentación de la API y despliegue en Render
 ├── sql/
-│   ├── 01_schema.sql         # DDL: Creación de BD y las 15 tablas relacionales con PK/FK
+│   ├── 01_schema.sql         # DDL: Creación de BD y las 14 tablas relacionales con PK/FK
 │   ├── 02_seed.sql           # DML: Datos iniciales de prueba (Proyecto "Laptops", usuarios, herramientas)
 │   └── 03_consultas_dss.sql  # DQL: Consultas de verificación, auditoría y cálculo de Scoring final
 └── README.md                 # Documentación técnica de arquitectura y guía de despliegue
 ```
 
-> La API expone CRUD completo (`GET`, `POST`, `PATCH`, `DELETE`) para las 15 tablas.
+> La API expone CRUD completo (`GET`, `POST`, `PATCH`, `DELETE`) para las 14 tablas.
 > Consulta [`backend/README.md`](backend/README.md) para el listado de endpoints.
 
 ---
 
-## 🗄️ Modelo de Datos (15 Tablas Relacionales)
+## 🗄️ Modelo de Datos (14 Tablas Relacionales)
 
 ### 1. Núcleo del Sistema y Control de Acceso
 * **`usuarios`**: Datos de los participantes (`id`, `nombre`, `telefono`, `correo`, `usuario`, `passw`).
@@ -76,8 +76,8 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
    Retroalimentación y observaciones de los decisores sobre las categorías (`idproy`, `idcat`, `idusuario`, `comentario`).
 6. **`voting`** *(Herramienta 5: Votación)*:  
    Votación porcentual de consenso de los decisores (`idproy`, `idcat`, `idusuario`, `voto`).
-7. **`criterios_pesos`** *(Herramienta 6: Ponderación)*:  
-   Ponderaciones cuantitativas asignadas a los criterios para el modelo matemático (`idproy`, `id`, `nombre`, `descripcion`, `peso`).
+7. **`criterios` (campo `peso`)** *(Herramienta 6: Ponderación)*:  
+   Ponderaciones cuantitativas asignadas directamente en `criterios.peso` para el modelo matemático.
 8. **`matriz_valuada`** *(Herramienta 7: Matriz Valuada)*:  
    Calificaciones de cada alternativa evaluada frente a cada criterio (`idproy`, `idalt`, `idcrit`, `valor`).
 
@@ -102,7 +102,7 @@ mysql -u root -p --default-character-set=utf8mb4 -e "source sql/01_schema.sql; s
 ### Opción B: Ejecución paso a paso en consola interactiva de MySQL
 
 ```sql
--- 1. Crear el esquema y las 15 tablas
+-- 1. Crear el esquema y las 14 tablas
 SOURCE sql/01_schema.sql;
 
 -- 2. Insertar los datos semilla de prueba
@@ -123,11 +123,11 @@ $$\text{Puntaje}(A_i) = \sum_{j=1}^{m} \left( \text{Valor}_{ij} \times \text{Pes
 ```sql
 SELECT 
     alt.nombre AS alternativa,
-    ROUND(SUM(mv.valor * cp.peso), 4) AS puntaje_scoring_total,
-    RANK() OVER (ORDER BY SUM(mv.valor * cp.peso) DESC) AS ranking_recomendacion
+    ROUND(SUM(mv.valor * COALESCE(c.peso, 0)), 4) AS puntaje_scoring_total,
+    RANK() OVER (ORDER BY SUM(mv.valor * COALESCE(c.peso, 0)) DESC) AS ranking_recomendacion
 FROM matriz_valuada mv
 INNER JOIN alternativas alt ON mv.idproy = alt.idproy AND mv.idalt = alt.id
-INNER JOIN criterios_pesos cp ON mv.idproy = cp.idproy AND mv.idcrit = cp.id
+INNER JOIN criterios c ON mv.idproy = c.idproy AND mv.idcrit = c.id
 WHERE mv.idproy = 1
 GROUP BY alt.id, alt.nombre
 ORDER BY puntaje_scoring_total DESC;

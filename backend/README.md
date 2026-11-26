@@ -1,6 +1,6 @@
 # Backend API — SADMG / DSS (TypeScript + Express + Drizzle ORM)
 
-API REST con **CRUD completo** para las 15 tablas del modelo relacional SADMG / DSS.
+API REST con **CRUD completo** para las 14 tablas del modelo relacional SADMG / DSS.
 Stack: **Node.js 20+**, **TypeScript**, **Express 4**, **Drizzle ORM**, **Zod** y **mysql2**
 (compatible con MySQL 8 y TiDB Cloud). Lista para desplegar en Render.
 
@@ -19,7 +19,7 @@ Comprobar que responde:
 
 ```bash
 curl http://localhost:3000/api/health
-# {"status":"ok","database":"dss_sadmg","tables_count":15}
+# {"status":"ok","database":"dss_sadmg","tables_count":14}
 ```
 
 Scripts disponibles:
@@ -41,7 +41,7 @@ src/
 ├── config/env.ts                # Validación de variables de entorno (Zod)
 ├── db/
 │   ├── client.ts                # Pool mysql2 + instancia Drizzle
-│   └── schema.ts                # Las 15 tablas (PK compuestas y FKs)
+│   └── schema.ts                # Las 14 tablas (PK compuestas y FKs)
 ├── crud/createCrudRouter.ts     # Factory CRUD reutilizable
 ├── middleware/
 │   ├── validate.ts              # Validación de body con Zod
@@ -85,8 +85,6 @@ automáticamente `GET`, `GET /:id`, `POST`, `PATCH /:id` y `DELETE /:id`.
 | GET/PATCH/DELETE | `/api/proyectos/:idproy/alternativas/:id` |
 | GET/POST | `/api/proyectos/:idproy/criterios` |
 | GET/PATCH/DELETE | `/api/proyectos/:idproy/criterios/:id` |
-| GET/POST | `/api/proyectos/:idproy/criterios-pesos` |
-| GET/PATCH/DELETE | `/api/proyectos/:idproy/criterios-pesos/:id` |
 | GET/POST | `/api/proyectos/:idproy/matriz` |
 | GET/PATCH/DELETE | `/api/proyectos/:idproy/matriz/:idalt/:idcrit` |
 

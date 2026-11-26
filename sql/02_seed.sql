@@ -41,20 +41,9 @@ VALUES
 (1, 3, 'lenovo', 'lenovo 17.2" color negro');
 
 -- -----------------------------------------------------
--- 5. Inserción en criterios (inicial sin pesos)
+-- 5. Inserción en criterios (con pesos de ponderación)
 -- -----------------------------------------------------
 INSERT INTO criterios (idproy, id, nombre, descripcion, peso)
-VALUES 
-(1, 1, 'ram', 'memoria ram', NULL),
-(1, 2, 'ssd', 'almacenamiento de estado solido', NULL),
-(1, 3, 'cpu', 'velocidad del procesador', NULL),
-(1, 4, 'tam pant', 'tamaño de pantalla', NULL),
-(1, 5, 'marca', 'marca del equipo', NULL);
-
--- -----------------------------------------------------
--- 6. Inserción en criterios_pesos (Herramienta 6: Ponderación)
--- -----------------------------------------------------
-INSERT INTO criterios_pesos (idproy, id, nombre, descripcion, peso)
 VALUES 
 (1, 1, 'ram', 'memoria ram', 0.3),
 (1, 2, 'ssd', 'almacenamiento de estado solido', 0.2),
@@ -63,7 +52,7 @@ VALUES
 (1, 5, 'marca', 'marca del equipo', 0.1);
 
 -- -----------------------------------------------------
--- 7. Inserción en matriz_valuada (Herramienta 7: Calificaciones)
+-- 6. Inserción en matriz_valuada (Herramienta 7: Calificaciones)
 -- -----------------------------------------------------
 INSERT INTO matriz_valuada (idproy, idalt, idcrit, valor)
 VALUES 

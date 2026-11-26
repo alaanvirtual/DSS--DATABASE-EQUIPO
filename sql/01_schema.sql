@@ -87,24 +87,7 @@ CREATE TABLE criterios (
 );
 
 -- -----------------------------------------------------
--- 6. Tabla: criterios_pesos (Herramienta 6: Ponderación)
--- Pesos / ponderaciones numéricas asignadas a criterios
--- -----------------------------------------------------
-CREATE TABLE criterios_pesos (
-    idproy BIGINT NOT NULL,
-    id BIGINT NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion VARCHAR(1000),
-    peso DECIMAL(10, 4) NOT NULL,
-    PRIMARY KEY (idproy, id),
-    CONSTRAINT fk_criterios_pesos_proyecto FOREIGN KEY (idproy)
-        REFERENCES proyectos (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
--- -----------------------------------------------------
--- 7. Tabla: matriz_valuada (Herramienta 7: Matriz Valuada)
+-- 6. Tabla: matriz_valuada (Herramienta 7: Matriz Valuada)
 -- Calificación de cada alternativa respecto a cada criterio
 -- -----------------------------------------------------
 CREATE TABLE matriz_valuada (

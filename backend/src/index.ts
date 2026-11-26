@@ -13,7 +13,6 @@ import {
   categoriasRouter,
   chatRouter,
   comentariosRouter,
-  criteriosPesosRouter,
   criteriosRouter,
   matrizRouter,
   participantesRouter,
@@ -44,7 +43,6 @@ export function createApp() {
   proyectosRouter.use('/:idproy/participantes', participantesRouter);
   proyectosRouter.use('/:idproy/alternativas', alternativasRouter);
   proyectosRouter.use('/:idproy/criterios', criteriosRouter);
-  proyectosRouter.use('/:idproy/criterios-pesos', criteriosPesosRouter);
   proyectosRouter.use('/:idproy/matriz', matrizRouter);
   proyectosRouter.use('/:idproy/scoring', scoringRouter);
 

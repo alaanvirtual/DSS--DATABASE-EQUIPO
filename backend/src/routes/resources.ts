@@ -11,7 +11,6 @@ import {
   chat,
   comenter,
   criterios,
-  criteriosPesos,
   matrizValuada,
   proyectos,
   proyectosUsuarios,
@@ -34,8 +33,6 @@ import {
   comenterCreate,
   comenterUpdate,
   criterioCreate,
-  criterioPesoCreate,
-  criterioPesoUpdate,
   criterioUpdate,
   matrizCreate,
   matrizUpdate,
@@ -115,17 +112,6 @@ export const criteriosRouter = createCrudRouter({
   inheritedKeys: [key('idproy', criterios.idproy)],
   pathKeys: [key('id', criterios.id)],
   orderBy: [asc(criterios.id)],
-  router: nested()
-});
-
-export const criteriosPesosRouter = createCrudRouter({
-  table: criteriosPesos,
-  label: 'Ponderación de criterio',
-  createSchema: criterioPesoCreate,
-  updateSchema: criterioPesoUpdate,
-  inheritedKeys: [key('idproy', criteriosPesos.idproy)],
-  pathKeys: [key('id', criteriosPesos.id)],
-  orderBy: [asc(criteriosPesos.id)],
   router: nested()
 });
 

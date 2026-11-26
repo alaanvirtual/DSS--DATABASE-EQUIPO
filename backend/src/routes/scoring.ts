@@ -24,10 +24,10 @@ scoringRouter.get(
           alt.id AS id_alternativa,
           alt.nombre AS alternativa,
           alt.descripcion,
-          ROUND(SUM(mv.valor * cp.peso), 4) AS puntaje_scoring_total
+          ROUND(SUM(mv.valor * COALESCE(c.peso, 0)), 4) AS puntaje_scoring_total
         FROM matriz_valuada mv
         INNER JOIN alternativas alt ON mv.idproy = alt.idproy AND mv.idalt = alt.id
-        INNER JOIN criterios_pesos cp ON mv.idproy = cp.idproy AND mv.idcrit = cp.id
+        INNER JOIN criterios c ON mv.idproy = c.idproy AND mv.idcrit = c.id
         WHERE mv.idproy = ${idproy}
         GROUP BY alt.id, alt.nombre, alt.descripcion
         ORDER BY puntaje_scoring_total DESC

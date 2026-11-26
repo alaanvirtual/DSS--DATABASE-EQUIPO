@@ -97,27 +97,6 @@ export const criterios = mysqlTable(
   ]
 );
 
-export const criteriosPesos = mysqlTable(
-  'criterios_pesos',
-  {
-    idproy: bigint('idproy', { mode: 'number' }).notNull(),
-    id: idColumn().notNull(),
-    nombre: varchar('nombre', { length: 100 }).notNull(),
-    descripcion: varchar('descripcion', { length: 1000 }),
-    peso: decimal('peso', { precision: 10, scale: 4, mode: 'number' }).notNull()
-  },
-  (t) => [
-    primaryKey({ columns: [t.idproy, t.id] }),
-    foreignKey({
-      columns: [t.idproy],
-      foreignColumns: [proyectos.id],
-      name: 'fk_criterios_pesos_proyecto'
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade')
-  ]
-);
-
 export const matrizValuada = mysqlTable(
   'matriz_valuada',
   {

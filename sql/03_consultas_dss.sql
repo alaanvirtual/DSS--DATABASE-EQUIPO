@@ -88,14 +88,14 @@ ORDER BY promedio_aprobacion_pct DESC;
 -- Consulta 6: Ponderación de Criterios (Pesos de Decisión)
 -- -----------------------------------------------------
 SELECT 
-    cp.id AS id_criterio,
-    cp.nombre AS criterio,
-    cp.descripcion,
-    cp.peso AS ponderacion,
-    CONCAT(ROUND(cp.peso * 100, 2), '%') AS porcentaje_importancia
-FROM criterios_pesos cp
-WHERE cp.idproy = 1
-ORDER BY cp.peso DESC;
+    c.id AS id_criterio,
+    c.nombre AS criterio,
+    c.descripcion,
+    c.peso AS ponderacion,
+    CONCAT(ROUND(c.peso * 100, 2), '%') AS porcentaje_importancia
+FROM criterios c
+WHERE c.idproy = 1
+ORDER BY c.peso DESC;
 
 -- -----------------------------------------------------
 -- Consulta 7: CÁLCULO FINAL DE SCORING MULTICRITERIO
@@ -106,11 +106,11 @@ SELECT
     alt.id AS id_alternativa,
     alt.nombre AS alternativa,
     alt.descripcion,
-    ROUND(SUM(mv.valor * cp.peso), 4) AS puntaje_scoring_total,
-    RANK() OVER (ORDER BY SUM(mv.valor * cp.peso) DESC) AS ranking_recomendacion
+    ROUND(SUM(mv.valor * COALESCE(c.peso, 0)), 4) AS puntaje_scoring_total,
+    RANK() OVER (ORDER BY SUM(mv.valor * COALESCE(c.peso, 0)) DESC) AS ranking_recomendacion
 FROM matriz_valuada mv
 INNER JOIN alternativas alt ON mv.idproy = alt.idproy AND mv.idalt = alt.id
-INNER JOIN criterios_pesos cp ON mv.idproy = cp.idproy AND mv.idcrit = cp.id
+INNER JOIN criterios c ON mv.idproy = c.idproy AND mv.idcrit = c.id
 WHERE mv.idproy = 1
 GROUP BY alt.id, alt.nombre, alt.descripcion
 ORDER BY puntaje_scoring_total DESC;
