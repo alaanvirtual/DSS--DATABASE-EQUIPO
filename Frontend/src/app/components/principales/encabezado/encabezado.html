@@ -1,0 +1,10 @@
+<header class="encabezado">
+  <span class="encabezado__marca"><app-icono nombre="users-three" [relleno]="true" tamano="1.6rem" /></span>
+  <div class="encabezado__textos">
+    <h1 class="encabezado__titulo">{{ titulo() }}</h1>
+    @if (subtitulo(); as texto) {
+      <p class="encabezado__subtitulo">{{ texto }}</p>
+    }
+  </div>
+  <div class="encabezado__acciones"><ng-content /></div>
+</header>

@@ -1,0 +1,36 @@
+.encabezado {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3) var(--espacio-5);
+  background: var(--color-oscuro);
+  color: var(--color-texto-inverso);
+  border-bottom: 3px solid var(--color-primario);
+}
+
+.encabezado__marca {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--color-primario);
+  border-radius: var(--radio-s);
+}
+
+.encabezado__textos {
+  flex: 1;
+}
+
+.encabezado__titulo {
+  font-size: 1.15rem;
+}
+
+.encabezado__subtitulo {
+  font-size: 0.85rem;
+  color: #c9cbd6;
+}
+
+.encabezado__acciones {
+  display: flex;
+  gap: var(--espacio-2);
+}

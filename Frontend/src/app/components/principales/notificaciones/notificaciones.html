@@ -1,0 +1,15 @@
+<div class="avisos" aria-live="polite">
+  @for (toast of servicio.toasts(); track toast.id) {
+    <div [class]="'aviso aviso--' + toast.tipo" role="status">
+      <app-icono [nombre]="icono(toast.tipo)" [relleno]="true" />
+      <span class="aviso__mensaje">{{ toast.mensaje }}</span>
+      <app-boton
+        variante="fantasma"
+        icono="x"
+        [soloIcono]="true"
+        etiquetaAria="Cerrar aviso"
+        (click)="servicio.cerrar(toast.id)"
+      />
+    </div>
+  }
+</div>

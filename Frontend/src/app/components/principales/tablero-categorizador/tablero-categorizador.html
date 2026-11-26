@@ -1,0 +1,83 @@
+@if (servicio.cargando()) {
+<app-cargando mensaje="Cargando tablero…" />
+} @else if (!servicio.topicoActual()) {
+<app-estado-vacio icono="folder-dashed" titulo="Sin tópico de categorización"
+  descripcion="Este proyecto no tiene en su agenda un tópico con la herramienta Categorizador." />
+} @else {
+<section class="tablero">
+  <header class="tablero__cabecera">
+    <div>
+      <h2 class="tablero__titulo">{{ servicio.topicoActual()?.topico }}</h2>
+      @if (servicio.topicoOrigenActual(); as origen) {
+      <p class="tablero__origen">
+        Agrupando las ideas de: <strong>{{ origen.topico }}</strong>
+      </p>
+      } @else {
+      <p class="tablero__origen">No hay una lluvia de ideas previa en la agenda.</p>
+      }
+    </div>
+
+    @if (servicio.puedeEditar()) {
+    <app-boton variante="primario" icono="plus" [deshabilitado]="servicio.guardando()" (click)="creando.set(true)">
+      Nueva categoría
+    </app-boton>
+    } @else {
+    <app-insignia variante="aviso"><app-icono nombre="lock-simple" /> Solo lectura</app-insignia>
+    }
+  </header>
+
+  <div class="tablero__cuerpo">
+    <section class="pendientes" [class.pendientes--encima]="encimaPendientes()"
+      (dragover)="alArrastrarSobrePendientes($event)" (dragleave)="alSalirDePendientes($event)"
+      (drop)="alSoltarEnPendientes($event)">
+      <header class="pendientes__cabecera">
+        <h3>Ideas sin categorizar</h3>
+        <app-insignia variante="aviso">{{ servicio.ideasSinCategorizar().length }}</app-insignia>
+      </header>
+
+      <div class="pendientes__lista">
+        @for (idea of servicio.ideasSinCategorizar(); track claveIdea(idea)) {
+        <app-tarjeta-idea [idea]="idea" [editable]="servicio.puedeEditar()" [destinos]="destinos()"
+          (mover)="asignar({ clave: claveIdea(idea), origen: null }, $event)" />
+        } @empty {
+        <app-estado-vacio icono="check-circle" titulo="Todo está categorizado"
+          descripcion="No quedan ideas pendientes en este tópico." />
+        }
+      </div>
+    </section>
+
+    <section class="categorias">
+      @for (columna of servicio.columnas(); track columna.categoria.id) {
+      <app-columna-categoria [columna]="columna" [editable]="servicio.puedeEditar()"
+        (soltar)="asignar($event, columna.categoria.id)" (renombrar)="renombrando.set(columna.categoria)"
+        (eliminar)="eliminando.set(columna.categoria)"
+        (quitarIdea)="servicio.quitarIdea($event, columna.categoria.id)" />
+      } @empty {
+      <app-estado-vacio icono="squares-four" titulo="Aún no hay categorías" [descripcion]="
+              servicio.puedeEditar()
+                ? 'Crea una categoría y arrastra las ideas hacia ella.'
+                : 'El facilitador todavía no ha creado categorías.'
+            " />
+      }
+    </section>
+  </div>
+</section>
+}
+
+@if (creando()) {
+<app-modal-nombre titulo="Nueva categoría" etiqueta="Nombre de la categoría" textoGuardar="Crear"
+  (guardar)="crear($event)" (cancelar)="creando.set(false)" />
+}
+
+@if (renombrando(); as categoria) {
+<app-modal-nombre titulo="Renombrar categoría" etiqueta="Nombre de la categoría" [valorInicial]="categoria.nombre"
+  (guardar)="renombrar($event)" (cancelar)="renombrando.set(null)" />
+}
+
+@if (eliminando(); as categoria) {
+<app-modal-confirmar titulo="Eliminar categoría" [mensaje]="
+      '¿Eliminar la categoría «' +
+      categoria.nombre +
+      '»? Se perderán sus asignaciones, comentarios y votos.'
+    " textoConfirmar="Eliminar" [peligro]="true" (confirmar)="eliminar()" (cancelar)="eliminando.set(null)" />
+}
