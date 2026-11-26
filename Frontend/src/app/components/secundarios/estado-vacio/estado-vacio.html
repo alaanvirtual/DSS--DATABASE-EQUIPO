@@ -1,0 +1,8 @@
+<div class="vacio">
+  <app-icono [nombre]="icono()" tamano="2.5rem" />
+  <h3 class="vacio__titulo">{{ titulo() }}</h3>
+  @if (descripcion(); as texto) {
+    <p class="vacio__texto">{{ texto }}</p>
+  }
+  <ng-content />
+</div>

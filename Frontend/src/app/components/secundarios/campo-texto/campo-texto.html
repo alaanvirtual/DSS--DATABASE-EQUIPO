@@ -1,0 +1,13 @@
+<label class="campo">
+  <span class="campo__etiqueta">{{ etiqueta() }}</span>
+  <input
+    #control
+    class="campo__control"
+    type="text"
+    [value]="valor()"
+    [placeholder]="marcador()"
+    [maxLength]="longitudMaxima()"
+    (input)="escribir($event)"
+    (keydown.enter)="enviar.emit()"
+  />
+</label>

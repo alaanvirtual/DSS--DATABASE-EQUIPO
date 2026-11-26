@@ -1,0 +1,36 @@
+:host {
+  display: inline-flex;
+}
+
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radio-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.insignia--neutro {
+  background: var(--color-fondo);
+  color: var(--color-texto-suave);
+  border: 1px solid var(--color-borde);
+}
+.insignia--primario {
+  background: var(--color-primario-suave);
+  color: var(--color-primario-oscuro);
+}
+.insignia--exito {
+  background: var(--color-exito-suave);
+  color: #005f5f;
+}
+.insignia--aviso {
+  background: var(--color-aviso-suave);
+  color: #6b5900;
+}
+.insignia--info {
+  background: var(--color-info-suave);
+  color: #234a91;
+}

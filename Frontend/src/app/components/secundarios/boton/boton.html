@@ -1,0 +1,13 @@
+<button
+  class="boton"
+  [class]="'boton boton--' + variante()"
+  [class.boton--solo-icono]="soloIcono()"
+  [type]="tipo()"
+  [disabled]="deshabilitado()"
+  [attr.aria-label]="etiquetaAria()"
+>
+  @if (icono(); as nombre) {
+    <app-icono [nombre]="nombre" />
+  }
+  <ng-content />
+</button>

@@ -1,0 +1,69 @@
+:host {
+  display: inline-flex;
+}
+
+:host(.deshabilitado) {
+  pointer-events: none;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
+  min-height: 2.5rem;
+  padding: 0 var(--espacio-4);
+  border: 1px solid transparent;
+  border-radius: var(--radio-s);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.boton:active {
+  transform: translateY(1px);
+}
+
+.boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.boton--solo-icono {
+  width: 2.5rem;
+  padding: 0;
+}
+
+.boton--primario {
+  background: var(--color-primario);
+  color: var(--color-texto-inverso);
+}
+.boton--primario:hover {
+  background: var(--color-primario-oscuro);
+}
+
+.boton--secundario {
+  background: var(--color-superficie);
+  color: var(--color-primario);
+  border-color: var(--color-primario);
+}
+.boton--secundario:hover {
+  background: var(--color-primario-suave);
+}
+
+.boton--peligro {
+  background: var(--color-acento);
+  color: var(--color-texto);
+}
+.boton--peligro:hover {
+  filter: brightness(0.93);
+}
+
+.boton--fantasma {
+  background: transparent;
+  color: var(--color-texto-suave);
+}
+.boton--fantasma:hover {
+  background: var(--color-primario-suave);
+  color: var(--color-primario);
+}
