@@ -119,7 +119,8 @@ export class Login implements OnInit {
       return {
         icono: 'warning-circle',
         titulo: 'No pudimos iniciar sesión',
-        descripcion: 'El usuario o la contraseña no son correctos. Revisa tus datos e inténtalo de nuevo.'
+        descripcion: 'El usuario o la contraseña no son correctos. Revisa tus datos e inténtalo de nuevo.',
+        reintentable: true
       };
     }
 

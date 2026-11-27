@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { OpcionSelect } from '../../../models/opcion-select';
 import { CategorizadorService } from '../../../services/categorizador.service';
 import { CampoSelect } from '../../secundarios/campo-select/campo-select';
+import { Esqueleto } from '../../secundarios/esqueleto/esqueleto';
 import { Insignia } from '../../secundarios/insignia/insignia';
 
 /**
@@ -10,13 +11,20 @@ import { Insignia } from '../../secundarios/insignia/insignia';
  */
 @Component({
   selector: 'app-barra-contexto',
-  imports: [CampoSelect, Insignia],
+  imports: [CampoSelect, Esqueleto, Insignia],
   templateUrl: './barra-contexto.html',
   styleUrl: './barra-contexto.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BarraContexto {
   protected readonly servicio = inject(CategorizadorService);
+
+  protected readonly camposEsqueleto = [1, 2];
+
+  /** Primera carga: todavía no hay proyectos que mostrar en los selectores. */
+  protected readonly cargandoContexto = computed(
+    () => this.servicio.cargando() && this.servicio.proyectos().length === 0
+  );
 
   protected readonly proyectos = computed<OpcionSelect[]>(() =>
     this.servicio.proyectos().map((p) => ({ valor: p.id, texto: p.nombre }))

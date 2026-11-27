@@ -1,20 +1,36 @@
-<div class="contexto">
-  <app-campo-select
-    etiqueta="Proyecto"
-    [opciones]="proyectos()"
-    [valor]="servicio.idproy()"
-    (valorChange)="alProyecto($event)"
-  />
-  <app-campo-select
-    etiqueta="Tópico de categorización"
-    [opciones]="topicos()"
-    [valor]="servicio.idtopico()"
-    [deshabilitado]="topicos().length === 0"
-    (valorChange)="alTopico($event)"
-  />
-  @if (servicio.rolActual(); as rol) {
-    <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
-      {{ rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
-    </app-insignia>
+<div
+  class="contexto"
+  [attr.role]="cargandoContexto() ? 'status' : null"
+  [attr.aria-busy]="cargandoContexto() ? 'true' : null"
+>
+  @if (cargandoContexto()) {
+    <span class="solo-lectores">Cargando proyectos…</span>
+
+    @for (n of camposEsqueleto; track n) {
+      <div class="contexto__campo">
+        <app-esqueleto ancho="6rem" alto="0.8rem" />
+        <app-esqueleto alto="2.5rem" />
+      </div>
+    }
+    <app-esqueleto ancho="6rem" alto="1.6rem" radio="var(--radio-pill)" />
+  } @else {
+    <app-campo-select
+      etiqueta="Proyecto"
+      [opciones]="proyectos()"
+      [valor]="servicio.idproy()"
+      (valorChange)="alProyecto($event)"
+    />
+    <app-campo-select
+      etiqueta="Tópico de categorización"
+      [opciones]="topicos()"
+      [valor]="servicio.idtopico()"
+      [deshabilitado]="topicos().length === 0"
+      (valorChange)="alTopico($event)"
+    />
+    @if (servicio.rolActual(); as rol) {
+      <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
+        {{ rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
+      </app-insignia>
+    }
   }
 </div>

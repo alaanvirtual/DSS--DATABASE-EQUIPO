@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { HERRAMIENTA, TopicoAgenda } from '../models/agenda';
 import { Categoria, ColumnaCategoria } from '../models/categoria';
+import { ErrorApi } from '../models/error-api';
 import { CategoriaDetalle } from '../models/categoria-detalle';
 import { ArrastreIdea, Idea, IdeaConAutor } from '../models/idea';
 import { Participante } from '../models/participante';
@@ -314,6 +315,12 @@ export class CategorizadorService {
   }
 
   private reportar(error: unknown): void {
+    if (error instanceof ErrorApi && error.estado === 403) {
+      // El servidor explica el motivo (rol, agenda, no participa...): se antepone que es un permiso.
+      this.toast.error(`Sin permiso: ${error.message}`);
+      return;
+    }
+
     this.toast.error(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
   }
 }

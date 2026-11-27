@@ -13,6 +13,16 @@ app-campo-select {
   max-width: 22rem;
 }
 
-app-insignia {
+app-insignia,
+.contexto > app-esqueleto {
   margin-bottom: 0.6rem;
+}
+
+/* Mismas medidas que app-campo-select para que no haya saltos al cargar. */
+.contexto__campo {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  max-width: 22rem;
 }

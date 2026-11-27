@@ -5,6 +5,8 @@ export interface DescripcionError {
   icono: string;
   titulo: string;
   descripcion: string;
+  /** Si volver a intentar tiene sentido (no lo tiene si falta un permiso o no existe el recurso). */
+  reintentable: boolean;
 }
 
 /** Convierte cualquier error en lo que se le muestra al usuario en <app-estado-error>. */
@@ -16,15 +18,26 @@ export function describirError(error: unknown): DescripcionError {
     return {
       icono: 'wifi-slash',
       titulo: 'Sin conexión con el servidor',
-      descripcion: 'Revisa tu conexión o que el servidor esté en marcha e inténtalo de nuevo.'
+      descripcion: 'Revisa tu conexión o que el servidor esté en marcha e inténtalo de nuevo.',
+      reintentable: true
     };
   }
 
-  if (estado === 401 || estado === 403) {
+  if (estado === 401) {
     return {
       icono: 'lock-key',
-      titulo: 'No tienes acceso',
-      descripcion: mensaje
+      titulo: 'Tu sesión no es válida',
+      descripcion: 'Inicia sesión de nuevo para continuar.',
+      reintentable: false
+    };
+  }
+
+  if (estado === 403) {
+    return {
+      icono: 'prohibit',
+      titulo: 'No tienes permiso',
+      descripcion: mensaje,
+      reintentable: false
     };
   }
 
@@ -32,7 +45,8 @@ export function describirError(error: unknown): DescripcionError {
     return {
       icono: 'magnifying-glass',
       titulo: 'No se encontró lo que buscas',
-      descripcion: mensaje
+      descripcion: mensaje,
+      reintentable: false
     };
   }
 
@@ -40,9 +54,10 @@ export function describirError(error: unknown): DescripcionError {
     return {
       icono: 'warning-octagon',
       titulo: 'El servidor tuvo un problema',
-      descripcion: 'Ocurrió un error en el servidor. Inténtalo de nuevo en unos momentos.'
+      descripcion: 'Ocurrió un error en el servidor. Inténtalo de nuevo en unos momentos.',
+      reintentable: true
     };
   }
 
-  return { icono: 'warning-circle', titulo: 'Algo salió mal', descripcion: mensaje };
+  return { icono: 'warning-circle', titulo: 'Algo salió mal', descripcion: mensaje, reintentable: true };
 }

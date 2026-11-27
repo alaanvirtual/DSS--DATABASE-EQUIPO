@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Categoria } from '../../../models/categoria';
 import { ArrastreIdea } from '../../../models/idea';
 import { OpcionSelect } from '../../../models/opcion-select';
@@ -32,6 +33,7 @@ import { Insignia } from '../../secundarios/insignia/insignia';
     Insignia,
     ModalConfirmar,
     ModalNombre,
+    RouterLink,
     TarjetaIdea
   ],
   templateUrl: './tablero-categorizador.html',

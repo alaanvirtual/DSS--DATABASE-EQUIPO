@@ -2,7 +2,11 @@
 <app-esqueleto-tablero />
 } @else if (servicio.errorCarga(); as error) {
 <app-estado-error [icono]="error.icono" [titulo]="error.titulo" [descripcion]="error.descripcion"
-  (reintentar)="servicio.reintentar()" />
+  [conAccion]="error.reintentable" (reintentar)="servicio.reintentar()">
+  @if (!error.reintentable) {
+  <app-boton variante="primario" icono="house" routerLink="/inicio">Volver al inicio</app-boton>
+  }
+</app-estado-error>
 } @else if (!servicio.topicoActual()) {
 <app-estado-vacio icono="folder-dashed" titulo="Sin tópico de categorización"
   descripcion="Este proyecto no tiene en su agenda un tópico con la herramienta Categorizador." />
