@@ -57,6 +57,7 @@ ORDER BY c.fecha, c.hora, c.id;
 -- Consulta 4: Consolidación de Lluvia de Ideas a Categorías
 -- -----------------------------------------------------
 SELECT 
+    cat.idtopico AS id_topico_categorizador,
     cat.id AS id_categoria,
     cat.nombre AS categoria,
     u.nombre AS decisor_que_propuso,
@@ -67,7 +68,7 @@ INNER JOIN categorizer cat ON cd.idproy = cat.idproy AND cd.idcat = cat.id
 INNER JOIN brainstorming b ON cd.idproy = b.idproy AND cd.idtopico = b.idtopico AND cd.idusuario = b.idusuario AND cd.ididea = b.id
 INNER JOIN usuarios u ON b.idusuario = u.id
 WHERE cd.idproy = 1
-ORDER BY cat.id, u.id;
+ORDER BY cat.idtopico, cat.id, u.id;
 
 -- -----------------------------------------------------
 -- Consulta 5: Resultados de Votación y Consenso por Categoría

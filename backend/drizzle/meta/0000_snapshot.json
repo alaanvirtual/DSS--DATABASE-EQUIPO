@@ -1,0 +1,1126 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "id": "884137ef-8767-42ce-9f51-1d03f49fd82d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "agenda": {
+      "name": "agenda",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "topico": {
+          "name": "topico",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rol": {
+          "name": "rol",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idtool": {
+          "name": "idtool",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_agenda_proyecto": {
+          "name": "fk_agenda_proyecto",
+          "tableFrom": "agenda",
+          "tableTo": "proyectos",
+          "columnsFrom": [
+            "idproy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_agenda_tool": {
+          "name": "fk_agenda_tool",
+          "tableFrom": "agenda",
+          "tableTo": "tools",
+          "columnsFrom": [
+            "idtool"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "agenda_idproy_id_pk": {
+          "name": "agenda_idproy_id_pk",
+          "columns": [
+            "idproy",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "alternativas": {
+      "name": "alternativas",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_alternativas_proyecto": {
+          "name": "fk_alternativas_proyecto",
+          "tableFrom": "alternativas",
+          "tableTo": "proyectos",
+          "columnsFrom": [
+            "idproy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "alternativas_idproy_id_pk": {
+          "name": "alternativas_idproy_id_pk",
+          "columns": [
+            "idproy",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "brainstorming": {
+      "name": "brainstorming",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idtopico": {
+          "name": "idtopico",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idusuario": {
+          "name": "idusuario",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "objetivo": {
+          "name": "objetivo",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_brainstorming_participante": {
+          "name": "idx_brainstorming_participante",
+          "columns": [
+            "idproy",
+            "idusuario"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_brainstorming_agenda": {
+          "name": "fk_brainstorming_agenda",
+          "tableFrom": "brainstorming",
+          "tableTo": "agenda",
+          "columnsFrom": [
+            "idproy",
+            "idtopico"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_brainstorming_participante": {
+          "name": "fk_brainstorming_participante",
+          "tableFrom": "brainstorming",
+          "tableTo": "proyectos_usuarios",
+          "columnsFrom": [
+            "idproy",
+            "idusuario"
+          ],
+          "columnsTo": [
+            "idproy",
+            "idusu"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "brainstorming_idproy_idtopico_idusuario_id_pk": {
+          "name": "brainstorming_idproy_idtopico_idusuario_id_pk",
+          "columns": [
+            "idproy",
+            "idtopico",
+            "idusuario",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "categorizer": {
+      "name": "categorizer",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idtopico": {
+          "name": "idtopico",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_categorizer_proyecto": {
+          "name": "fk_categorizer_proyecto",
+          "tableFrom": "categorizer",
+          "tableTo": "proyectos",
+          "columnsFrom": [
+            "idproy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_categorizer_agenda": {
+          "name": "fk_categorizer_agenda",
+          "tableFrom": "categorizer",
+          "tableTo": "agenda",
+          "columnsFrom": [
+            "idproy",
+            "idtopico"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "categorizer_idproy_id_pk": {
+          "name": "categorizer_idproy_id_pk",
+          "columns": [
+            "idproy",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "uq_categorizer_nombre": {
+          "name": "uq_categorizer_nombre",
+          "columns": [
+            "idproy",
+            "idtopico",
+            "nombre"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "categorizerdet": {
+      "name": "categorizerdet",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idcat": {
+          "name": "idcat",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idtopico": {
+          "name": "idtopico",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idusuario": {
+          "name": "idusuario",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ididea": {
+          "name": "ididea",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_catdet_categorizer": {
+          "name": "fk_catdet_categorizer",
+          "tableFrom": "categorizerdet",
+          "tableTo": "categorizer",
+          "columnsFrom": [
+            "idproy",
+            "idcat"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_catdet_brainstorming": {
+          "name": "fk_catdet_brainstorming",
+          "tableFrom": "categorizerdet",
+          "tableTo": "brainstorming",
+          "columnsFrom": [
+            "idproy",
+            "idtopico",
+            "idusuario",
+            "ididea"
+          ],
+          "columnsTo": [
+            "idproy",
+            "idtopico",
+            "idusuario",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "categorizerdet_idproy_idcat_idtopico_idusuario_ididea_pk": {
+          "name": "categorizerdet_idproy_idcat_idtopico_idusuario_ididea_pk",
+          "columns": [
+            "idproy",
+            "idcat",
+            "idtopico",
+            "idusuario",
+            "ididea"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "chat": {
+      "name": "chat",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idtopico": {
+          "name": "idtopico",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idusuario": {
+          "name": "idusuario",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hora": {
+          "name": "hora",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mensaje": {
+          "name": "mensaje",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_chat_participante": {
+          "name": "idx_chat_participante",
+          "columns": [
+            "idproy",
+            "idusuario"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_chat_agenda": {
+          "name": "fk_chat_agenda",
+          "tableFrom": "chat",
+          "tableTo": "agenda",
+          "columnsFrom": [
+            "idproy",
+            "idtopico"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_chat_participante": {
+          "name": "fk_chat_participante",
+          "tableFrom": "chat",
+          "tableTo": "proyectos_usuarios",
+          "columnsFrom": [
+            "idproy",
+            "idusuario"
+          ],
+          "columnsTo": [
+            "idproy",
+            "idusu"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "chat_idproy_idtopico_idusuario_id_pk": {
+          "name": "chat_idproy_idtopico_idusuario_id_pk",
+          "columns": [
+            "idproy",
+            "idtopico",
+            "idusuario",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "comenter": {
+      "name": "comenter",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idcat": {
+          "name": "idcat",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idusuario": {
+          "name": "idusuario",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "comentario": {
+          "name": "comentario",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_comenter_participante": {
+          "name": "idx_comenter_participante",
+          "columns": [
+            "idproy",
+            "idusuario"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_comenter_categorizer": {
+          "name": "fk_comenter_categorizer",
+          "tableFrom": "comenter",
+          "tableTo": "categorizer",
+          "columnsFrom": [
+            "idproy",
+            "idcat"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_comenter_participante": {
+          "name": "fk_comenter_participante",
+          "tableFrom": "comenter",
+          "tableTo": "proyectos_usuarios",
+          "columnsFrom": [
+            "idproy",
+            "idusuario"
+          ],
+          "columnsTo": [
+            "idproy",
+            "idusu"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "comenter_idproy_idcat_idusuario_pk": {
+          "name": "comenter_idproy_idcat_idusuario_pk",
+          "columns": [
+            "idproy",
+            "idcat",
+            "idusuario"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "criterios": {
+      "name": "criterios",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "peso": {
+          "name": "peso",
+          "type": "decimal(10,4)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_criterios_proyecto": {
+          "name": "fk_criterios_proyecto",
+          "tableFrom": "criterios",
+          "tableTo": "proyectos",
+          "columnsFrom": [
+            "idproy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "criterios_idproy_id_pk": {
+          "name": "criterios_idproy_id_pk",
+          "columns": [
+            "idproy",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "matriz_valuada": {
+      "name": "matriz_valuada",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idalt": {
+          "name": "idalt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idcrit": {
+          "name": "idcrit",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "valor": {
+          "name": "valor",
+          "type": "decimal(10,4)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_matriz_proyecto": {
+          "name": "fk_matriz_proyecto",
+          "tableFrom": "matriz_valuada",
+          "tableTo": "proyectos",
+          "columnsFrom": [
+            "idproy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_matriz_alternativas": {
+          "name": "fk_matriz_alternativas",
+          "tableFrom": "matriz_valuada",
+          "tableTo": "alternativas",
+          "columnsFrom": [
+            "idproy",
+            "idalt"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_matriz_criterios": {
+          "name": "fk_matriz_criterios",
+          "tableFrom": "matriz_valuada",
+          "tableTo": "criterios",
+          "columnsFrom": [
+            "idproy",
+            "idcrit"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "matriz_valuada_idproy_idalt_idcrit_pk": {
+          "name": "matriz_valuada_idproy_idalt_idcrit_pk",
+          "columns": [
+            "idproy",
+            "idalt",
+            "idcrit"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "proyectos": {
+      "name": "proyectos",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "objetivo": {
+          "name": "objetivo",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fechainicio": {
+          "name": "fechainicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fechafin": {
+          "name": "fechafin",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "estatus": {
+          "name": "estatus",
+          "type": "tinyint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "proyectos_id": {
+          "name": "proyectos_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {
+        "ck_proyectos_estatus": {
+          "name": "ck_proyectos_estatus",
+          "value": "`proyectos`.`estatus` IN (1, 2)"
+        }
+      }
+    },
+    "proyectos_usuarios": {
+      "name": "proyectos_usuarios",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idusu": {
+          "name": "idusu",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rol": {
+          "name": "rol",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fk_proy_usu_proyecto": {
+          "name": "fk_proy_usu_proyecto",
+          "tableFrom": "proyectos_usuarios",
+          "tableTo": "proyectos",
+          "columnsFrom": [
+            "idproy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_proy_usu_usuario": {
+          "name": "fk_proy_usu_usuario",
+          "tableFrom": "proyectos_usuarios",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "idusu"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "proyectos_usuarios_idproy_idusu_pk": {
+          "name": "proyectos_usuarios_idproy_idusu_pk",
+          "columns": [
+            "idproy",
+            "idusu"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {
+        "ck_proy_usu_rol": {
+          "name": "ck_proy_usu_rol",
+          "value": "`proyectos_usuarios`.`rol` IN ('FAC', 'DEC')"
+        }
+      }
+    },
+    "tools": {
+      "name": "tools",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "tools_id": {
+          "name": "tools_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "usuarios": {
+      "name": "usuarios",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "correo": {
+          "name": "correo",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "usuario": {
+          "name": "usuario",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "passw": {
+          "name": "passw",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "usuarios_id": {
+          "name": "usuarios_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "uq_usuarios_usuario": {
+          "name": "uq_usuarios_usuario",
+          "columns": [
+            "usuario"
+          ]
+        },
+        "uq_usuarios_correo": {
+          "name": "uq_usuarios_correo",
+          "columns": [
+            "correo"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "voting": {
+      "name": "voting",
+      "columns": {
+        "idproy": {
+          "name": "idproy",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idcat": {
+          "name": "idcat",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "idusuario": {
+          "name": "idusuario",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "voto": {
+          "name": "voto",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_voting_participante": {
+          "name": "idx_voting_participante",
+          "columns": [
+            "idproy",
+            "idusuario"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "fk_voting_categorizer": {
+          "name": "fk_voting_categorizer",
+          "tableFrom": "voting",
+          "tableTo": "categorizer",
+          "columnsFrom": [
+            "idproy",
+            "idcat"
+          ],
+          "columnsTo": [
+            "idproy",
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "fk_voting_participante": {
+          "name": "fk_voting_participante",
+          "tableFrom": "voting",
+          "tableTo": "proyectos_usuarios",
+          "columnsFrom": [
+            "idproy",
+            "idusuario"
+          ],
+          "columnsTo": [
+            "idproy",
+            "idusu"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "voting_idproy_idcat_idusuario_pk": {
+          "name": "voting_idproy_idcat_idusuario_pk",
+          "columns": [
+            "idproy",
+            "idcat",
+            "idusuario"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {
+        "ck_voting_voto": {
+          "name": "ck_voting_voto",
+          "value": "`voting`.`voto` BETWEEN 0 AND 100"
+        }
+      }
+    }
+  },
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {},
+    "indexes": {}
+  }
+}

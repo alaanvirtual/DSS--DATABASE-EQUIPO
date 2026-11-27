@@ -7,7 +7,14 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx src/db/seed.ts",
+    "db:hash-passwords": "tsx src/db/hash-passwords.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:marcar-aplicadas": "tsx src/db/marcar-aplicadas.ts",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "engines": {
     "node": ">=20"
@@ -17,13 +24,16 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.44.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.2",
+    "drizzle-kit": "^0.31.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }

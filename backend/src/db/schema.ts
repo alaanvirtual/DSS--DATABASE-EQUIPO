@@ -1,34 +1,54 @@
+import { sql } from 'drizzle-orm';
 import {
   bigint,
+  check,
   date,
   decimal,
   foreignKey,
+  index,
   mysqlTable,
   primaryKey,
   time,
   tinyint,
+  unique,
   varchar
 } from 'drizzle-orm/mysql-core';
 
+// Este archivo es la fuente de verdad del esquema: Drizzle Kit genera las
+// migraciones SQL (carpeta drizzle/) comparándolo con la versión anterior.
+// Mantén sql/01_schema.sql solo como referencia legible.
+
 const idColumn = () => bigint('id', { mode: 'number' });
 
-export const usuarios = mysqlTable('usuarios', {
-  id: bigint('id', { mode: 'number' }).autoincrement().primaryKey(),
-  nombre: varchar('nombre', { length: 100 }).notNull(),
-  telefono: varchar('telefono', { length: 20 }),
-  correo: varchar('correo', { length: 200 }).notNull(),
-  usuario: varchar('usuario', { length: 100 }).notNull(),
-  passw: varchar('passw', { length: 100 }).notNull()
-});
+export const usuarios = mysqlTable(
+  'usuarios',
+  {
+    id: bigint('id', { mode: 'number' }).autoincrement().primaryKey(),
+    nombre: varchar('nombre', { length: 100 }).notNull(),
+    telefono: varchar('telefono', { length: 20 }),
+    correo: varchar('correo', { length: 200 }).notNull(),
+    usuario: varchar('usuario', { length: 100 }).notNull(),
+    // Hash scrypt (ver lib/password.ts), nunca la contraseña en claro.
+    passw: varchar('passw', { length: 255 }).notNull()
+  },
+  (t) => [
+    unique('uq_usuarios_usuario').on(t.usuario),
+    unique('uq_usuarios_correo').on(t.correo)
+  ]
+);
 
-export const proyectos = mysqlTable('proyectos', {
-  id: bigint('id', { mode: 'number' }).autoincrement().primaryKey(),
-  nombre: varchar('nombre', { length: 100 }).notNull(),
-  objetivo: varchar('objetivo', { length: 1000 }),
-  fechainicio: date('fechainicio', { mode: 'string' }),
-  fechafin: date('fechafin', { mode: 'string' }),
-  estatus: tinyint('estatus').notNull()
-});
+export const proyectos = mysqlTable(
+  'proyectos',
+  {
+    id: bigint('id', { mode: 'number' }).autoincrement().primaryKey(),
+    nombre: varchar('nombre', { length: 100 }).notNull(),
+    objetivo: varchar('objetivo', { length: 1000 }),
+    fechainicio: date('fechainicio', { mode: 'string' }),
+    fechafin: date('fechafin', { mode: 'string' }),
+    estatus: tinyint('estatus').notNull() // 1 = activo, 2 = cerrado
+  },
+  (t) => [check('ck_proyectos_estatus', sql`${t.estatus} IN (1, 2)`)]
+);
 
 export const proyectosUsuarios = mysqlTable(
   'proyectos_usuarios',
@@ -39,6 +59,7 @@ export const proyectosUsuarios = mysqlTable(
   },
   (t) => [
     primaryKey({ columns: [t.idproy, t.idusu] }),
+    check('ck_proy_usu_rol', sql`${t.rol} IN ('FAC', 'DEC')`),
     foreignKey({
       columns: [t.idproy],
       foreignColumns: [proyectos.id],
@@ -185,10 +206,11 @@ export const chat = mysqlTable(
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
+    index('idx_chat_participante').on(t.idproy, t.idusuario),
     foreignKey({
-      columns: [t.idusuario],
-      foreignColumns: [usuarios.id],
-      name: 'fk_chat_usuario'
+      columns: [t.idproy, t.idusuario],
+      foreignColumns: [proyectosUsuarios.idproy, proyectosUsuarios.idusu],
+      name: 'fk_chat_participante'
     })
       .onDelete('cascade')
       .onUpdate('cascade')
@@ -214,10 +236,11 @@ export const brainstorming = mysqlTable(
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
+    index('idx_brainstorming_participante').on(t.idproy, t.idusuario),
     foreignKey({
-      columns: [t.idusuario],
-      foreignColumns: [usuarios.id],
-      name: 'fk_brainstorming_usuario'
+      columns: [t.idproy, t.idusuario],
+      foreignColumns: [proyectosUsuarios.idproy, proyectosUsuarios.idusu],
+      name: 'fk_brainstorming_participante'
     })
       .onDelete('cascade')
       .onUpdate('cascade')
@@ -229,14 +252,24 @@ export const categorizer = mysqlTable(
   {
     idproy: bigint('idproy', { mode: 'number' }).notNull(),
     id: idColumn().notNull(),
+    // Tópico de la agenda (herramienta 3) al que pertenece la categoría.
+    idtopico: bigint('idtopico', { mode: 'number' }).notNull(),
     nombre: varchar('nombre', { length: 100 }).notNull()
   },
   (t) => [
     primaryKey({ columns: [t.idproy, t.id] }),
+    unique('uq_categorizer_nombre').on(t.idproy, t.idtopico, t.nombre),
     foreignKey({
       columns: [t.idproy],
       foreignColumns: [proyectos.id],
       name: 'fk_categorizer_proyecto'
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+    foreignKey({
+      columns: [t.idproy, t.idtopico],
+      foreignColumns: [agenda.idproy, agenda.id],
+      name: 'fk_categorizer_agenda'
     })
       .onDelete('cascade')
       .onUpdate('cascade')
@@ -288,10 +321,11 @@ export const comenter = mysqlTable(
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
+    index('idx_comenter_participante').on(t.idproy, t.idusuario),
     foreignKey({
-      columns: [t.idusuario],
-      foreignColumns: [usuarios.id],
-      name: 'fk_comenter_usuario'
+      columns: [t.idproy, t.idusuario],
+      foreignColumns: [proyectosUsuarios.idproy, proyectosUsuarios.idusu],
+      name: 'fk_comenter_participante'
     })
       .onDelete('cascade')
       .onUpdate('cascade')
@@ -315,10 +349,12 @@ export const voting = mysqlTable(
     })
       .onDelete('cascade')
       .onUpdate('cascade'),
+    index('idx_voting_participante').on(t.idproy, t.idusuario),
+    check('ck_voting_voto', sql`${t.voto} BETWEEN 0 AND 100`),
     foreignKey({
-      columns: [t.idusuario],
-      foreignColumns: [usuarios.id],
-      name: 'fk_voting_usuario'
+      columns: [t.idproy, t.idusuario],
+      foreignColumns: [proyectosUsuarios.idproy, proyectosUsuarios.idusu],
+      name: 'fk_voting_participante'
     })
       .onDelete('cascade')
       .onUpdate('cascade')

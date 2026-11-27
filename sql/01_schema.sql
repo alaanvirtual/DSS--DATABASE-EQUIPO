@@ -1,11 +1,17 @@
 -- =====================================================================
 -- Base de Datos SADMG / DSS — Sistema de Apoyo a la Decisión Multicriterio en Grupo
 -- Archivo: 01_schema.sql (DDL - Definición de Estructura de Tablas)
--- Motor: MySQL 8.0+ / MariaDB
+-- Motor: MySQL 8.0.16+ / MariaDB 10.2+ / TiDB 8.x
+--
+-- Este script NO borra nada: si las tablas ya existen, falla. Para actualizar
+-- una BD existente usa 04_migracion_esquema.sql; para recargar datos de prueba
+-- usa el script del backend: `npm run seed -- --yes`.
+--
+-- Para crear el esquema en otra BD (p. ej. dss_sadmg_dev) cambia el nombre en
+-- las dos líneas siguientes y en DB_NAME del .env del backend.
 -- =====================================================================
 
-DROP DATABASE IF EXISTS dss_sadmg;
-CREATE DATABASE dss_sadmg CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS dss_sadmg CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE dss_sadmg;
 
 -- -----------------------------------------------------
@@ -18,7 +24,9 @@ CREATE TABLE usuarios (
     telefono VARCHAR(20),
     correo VARCHAR(200) NOT NULL,
     usuario VARCHAR(100) NOT NULL,
-    passw VARCHAR(100) NOT NULL
+    passw VARCHAR(255) NOT NULL COMMENT 'hash scrypt, nunca la contraseña en claro',
+    CONSTRAINT uq_usuarios_usuario UNIQUE (usuario),
+    CONSTRAINT uq_usuarios_correo UNIQUE (correo)
 );
 
 -- -----------------------------------------------------
@@ -31,7 +39,8 @@ CREATE TABLE proyectos (
     objetivo VARCHAR(1000),
     fechainicio DATE,
     fechafin DATE,
-    estatus TINYINT NOT NULL COMMENT '1=activo, 2=cerrado'
+    estatus TINYINT NOT NULL COMMENT '1=activo, 2=cerrado',
+    CONSTRAINT ck_proyectos_estatus CHECK (estatus IN (1, 2))
 );
 
 -- -----------------------------------------------------
@@ -43,6 +52,7 @@ CREATE TABLE proyectos_usuarios (
     idusu BIGINT NOT NULL,
     rol VARCHAR(3) NOT NULL COMMENT 'FAC=Facilitador, DEC=Decisor',
     PRIMARY KEY (idproy, idusu),
+    CONSTRAINT ck_proy_usu_rol CHECK (rol IN ('FAC', 'DEC')),
     CONSTRAINT fk_proy_usu_proyecto FOREIGN KEY (idproy)
         REFERENCES proyectos (id)
         ON DELETE CASCADE
@@ -111,7 +121,7 @@ CREATE TABLE matriz_valuada (
 );
 
 -- -----------------------------------------------------
--- 8. Tabla: tools
+-- 7. Tabla: tools
 -- Catálogo de herramientas del modelo de discusión
 -- -----------------------------------------------------
 CREATE TABLE tools (
@@ -121,14 +131,14 @@ CREATE TABLE tools (
 );
 
 -- -----------------------------------------------------
--- 9. Tabla: agenda
+-- 8. Tabla: agenda
 -- Cronograma y plan de reunión (tópicos, roles y tools)
 -- -----------------------------------------------------
 CREATE TABLE agenda (
     idproy BIGINT NOT NULL,
     id BIGINT NOT NULL,
     topico VARCHAR(100) NOT NULL,
-    rol VARCHAR(20) NOT NULL,
+    rol VARCHAR(20) NOT NULL COMMENT 'FAC, DEC o "FAC, DEC"',
     idtool BIGINT NOT NULL,
     PRIMARY KEY (idproy, id),
     CONSTRAINT fk_agenda_proyecto FOREIGN KEY (idproy)
@@ -142,8 +152,9 @@ CREATE TABLE agenda (
 );
 
 -- -----------------------------------------------------
--- 10. Tabla: chat (Herramienta 1: Chat)
--- Mensajería entre facilitador y decisores
+-- 9. Tabla: chat (Herramienta 1: Chat)
+-- Mensajería entre facilitador y decisores.
+-- El autor debe participar en el proyecto (fk_chat_participante).
 -- -----------------------------------------------------
 CREATE TABLE chat (
     idproy BIGINT NOT NULL,
@@ -154,18 +165,19 @@ CREATE TABLE chat (
     hora TIME NOT NULL,
     mensaje VARCHAR(1000) NOT NULL,
     PRIMARY KEY (idproy, idtopico, idusuario, id),
+    KEY idx_chat_participante (idproy, idusuario),
     CONSTRAINT fk_chat_agenda FOREIGN KEY (idproy, idtopico)
         REFERENCES agenda (idproy, id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_chat_usuario FOREIGN KEY (idusuario)
-        REFERENCES usuarios (id)
+    CONSTRAINT fk_chat_participante FOREIGN KEY (idproy, idusuario)
+        REFERENCES proyectos_usuarios (idproy, idusu)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
--- 11. Tabla: brainstorming (Herramienta 2: Lluvia de Ideas)
+-- 10. Tabla: brainstorming (Herramienta 2: Lluvia de Ideas)
 -- Propuestas iniciales de alternativas y criterios
 -- -----------------------------------------------------
 CREATE TABLE brainstorming (
@@ -176,34 +188,45 @@ CREATE TABLE brainstorming (
     nombre VARCHAR(100) NOT NULL,
     objetivo VARCHAR(1000),
     PRIMARY KEY (idproy, idtopico, idusuario, id),
+    KEY idx_brainstorming_participante (idproy, idusuario),
     CONSTRAINT fk_brainstorming_agenda FOREIGN KEY (idproy, idtopico)
         REFERENCES agenda (idproy, id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_brainstorming_usuario FOREIGN KEY (idusuario)
-        REFERENCES usuarios (id)
+    CONSTRAINT fk_brainstorming_participante FOREIGN KEY (idproy, idusuario)
+        REFERENCES proyectos_usuarios (idproy, idusu)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
--- 12. Tabla: categorizer (Herramienta 3: Categorizador)
--- Categorías consolidadas para agrupar ideas
+-- 11. Tabla: categorizer (Herramienta 3: Categorizador)
+-- Categorías consolidadas para agrupar ideas.
+-- idtopico es el tópico de categorización de la agenda al que pertenece la
+-- categoría: así el categorizador de alternativas y el de criterios no
+-- comparten categorías. El id es único dentro del proyecto.
 -- -----------------------------------------------------
 CREATE TABLE categorizer (
     idproy BIGINT NOT NULL,
     id BIGINT NOT NULL,
+    idtopico BIGINT NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     PRIMARY KEY (idproy, id),
+    CONSTRAINT uq_categorizer_nombre UNIQUE (idproy, idtopico, nombre),
     CONSTRAINT fk_categorizer_proyecto FOREIGN KEY (idproy)
         REFERENCES proyectos (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_categorizer_agenda FOREIGN KEY (idproy, idtopico)
+        REFERENCES agenda (idproy, id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
--- 13. Tabla: categorizerdet (Herramienta 3: Detalle)
+-- 12. Tabla: categorizerdet (Herramienta 3: Detalle)
 -- Asignación de ideas individuales a cada categoría
+-- (idtopico aquí es el tópico de la lluvia de ideas de origen)
 -- -----------------------------------------------------
 CREATE TABLE categorizerdet (
     idproy BIGINT NOT NULL,
@@ -223,7 +246,7 @@ CREATE TABLE categorizerdet (
 );
 
 -- -----------------------------------------------------
--- 14. Tabla: comenter (Herramienta 4: Comentador)
+-- 13. Tabla: comenter (Herramienta 4: Comentador)
 -- Comentarios y retroalimentación sobre las categorías
 -- -----------------------------------------------------
 CREATE TABLE comenter (
@@ -232,18 +255,19 @@ CREATE TABLE comenter (
     idusuario BIGINT NOT NULL,
     comentario VARCHAR(1000) NOT NULL,
     PRIMARY KEY (idproy, idcat, idusuario),
+    KEY idx_comenter_participante (idproy, idusuario),
     CONSTRAINT fk_comenter_categorizer FOREIGN KEY (idproy, idcat)
         REFERENCES categorizer (idproy, id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_comenter_usuario FOREIGN KEY (idusuario)
-        REFERENCES usuarios (id)
+    CONSTRAINT fk_comenter_participante FOREIGN KEY (idproy, idusuario)
+        REFERENCES proyectos_usuarios (idproy, idusu)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
--- 15. Tabla: voting (Herramienta 5: Votación)
+-- 14. Tabla: voting (Herramienta 5: Votación)
 -- Votos porcentuales sobre las categorías priorizadas
 -- -----------------------------------------------------
 CREATE TABLE voting (
@@ -252,12 +276,14 @@ CREATE TABLE voting (
     idusuario BIGINT NOT NULL,
     voto DECIMAL(5, 2) NOT NULL,
     PRIMARY KEY (idproy, idcat, idusuario),
+    KEY idx_voting_participante (idproy, idusuario),
+    CONSTRAINT ck_voting_voto CHECK (voto BETWEEN 0 AND 100),
     CONSTRAINT fk_voting_categorizer FOREIGN KEY (idproy, idcat)
         REFERENCES categorizer (idproy, id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_voting_usuario FOREIGN KEY (idusuario)
-        REFERENCES usuarios (id)
+    CONSTRAINT fk_voting_participante FOREIGN KEY (idproy, idusuario)
+        REFERENCES proyectos_usuarios (idproy, idusu)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
