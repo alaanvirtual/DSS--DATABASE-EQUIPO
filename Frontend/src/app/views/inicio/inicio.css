@@ -1,88 +1,291 @@
+:host {
+  display: block;
+}
+
+/* Contenedor de la página: ancho máximo y márgenes. */
 .inicio {
   display: grid;
-  gap: var(--espacio-4);
+  gap: var(--espacio-5);
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--espacio-5) var(--espacio-4) var(--espacio-6);
 }
 
-.inicio__contexto {
+/* ── Barra superior: selector de proyecto y acción principal ──────────── */
+
+.barra {
   display: flex;
-  align-items: center;
-  gap: var(--espacio-4);
   flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--espacio-3) var(--espacio-4);
 }
 
-.inicio__contexto > app-boton {
-  margin-left: auto;
+.barra app-campo-select {
+  flex: 1 1 16rem;
+  max-width: 24rem;
 }
 
-.inicio__objetivo {
-  margin: 0;
+/* ── Tarjeta del proyecto ─────────────────────────────────────────────── */
+
+.proyecto {
+  display: grid;
+  gap: var(--espacio-3);
+  padding: var(--espacio-5);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-left: 5px solid var(--color-primario);
+  border-radius: var(--radio-m);
+  box-shadow: var(--sombra-s);
+}
+
+.proyecto--cerrado {
+  border-left-color: var(--color-texto-suave);
+}
+
+.proyecto__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-2) var(--espacio-3);
+}
+
+.proyecto__nombre {
+  font-size: 1.6rem;
+  text-transform: capitalize;
+}
+
+.proyecto__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+}
+
+.proyecto__objetivo {
+  max-width: 70ch;
+  font-size: 1.05rem;
   color: var(--color-texto-suave);
 }
 
-.inicio__paneles {
+.proyecto__datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2) var(--espacio-5);
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+  list-style: none;
+}
+
+.proyecto__datos li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+/* ── Paneles: la agenda es la columna principal ───────────────────────── */
+
+.paneles {
   display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
   gap: var(--espacio-4);
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
   align-items: start;
 }
 
-.inicio__panel {
+.panel {
   display: grid;
-  gap: var(--espacio-2);
-  padding: var(--espacio-4);
+  gap: var(--espacio-4);
+  padding: var(--espacio-5);
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-m);
   box-shadow: var(--sombra-s);
 }
 
-.inicio__panel-cabecera {
+.panel__cabecera {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--espacio-2);
+  padding-bottom: var(--espacio-3);
+  border-bottom: 1px solid var(--color-borde);
 }
 
-.inicio__panel-titulo {
-  margin: 0;
-  font-size: 1.05rem;
+.panel__titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-size: 1.1rem;
 }
 
-.inicio__lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.panel__titulo app-icono {
+  color: var(--color-primario);
+}
+
+.lista {
   display: grid;
   gap: var(--espacio-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.inicio__elemento {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* ── Agenda: pasos numerados ──────────────────────────────────────────── */
+
+.paso {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
   gap: var(--espacio-3);
-  padding: var(--espacio-2) var(--espacio-3);
+  align-items: center;
+  padding: var(--espacio-3);
   background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-m);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.paso:hover {
+  border-color: var(--color-primario);
+  box-shadow: var(--sombra-s);
+}
+
+.paso__numero {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  background: var(--color-primario-suave);
+  border-radius: 50%;
+}
+
+.paso__icono {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.2rem;
+  color: var(--color-primario);
+  background: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-s);
 }
 
-.inicio__datos {
+.paso__datos {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
-.inicio__herramienta {
-  font-weight: 600;
+.paso__herramienta {
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
-.inicio__topico {
-  color: var(--color-texto-suave);
+.paso__topico {
+  overflow: hidden;
   font-size: 0.9rem;
+  color: var(--color-texto-suave);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.inicio__acciones {
+.paso__acciones {
   display: flex;
   align-items: center;
   gap: var(--espacio-1);
+}
+
+/* ── Participantes ────────────────────────────────────────────────────── */
+
+.persona {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-2) var(--espacio-3);
+  border-radius: var(--radio-m);
+  transition: background 0.15s;
+}
+
+.persona:hover {
+  background: var(--color-fondo);
+}
+
+.persona__avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  background: var(--color-info-suave);
+  border-radius: 50%;
+}
+
+.persona__avatar--fac {
+  color: var(--color-texto-inverso);
+  background: var(--color-primario);
+}
+
+.persona__nombre {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Carga y estado vacío ─────────────────────────────────────────────── */
+
+.esqueleto {
+  display: grid;
+  gap: var(--espacio-5);
+}
+
+.vacio {
+  background: var(--color-superficie);
+  border: 1px dashed var(--color-borde);
+  border-radius: var(--radio-m);
+}
+
+/* ── Pantallas angostas ───────────────────────────────────────────────── */
+
+@media (max-width: 60rem) {
+  .paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 40rem) {
+  .inicio {
+    padding: var(--espacio-4) var(--espacio-3) var(--espacio-5);
+  }
+
+  .barra app-boton {
+    width: 100%;
+  }
+
+  /* En móvil la fila se simplifica: sin número ni rol, y las acciones debajo. */
+  .paso {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .paso__numero,
+  .paso app-insignia {
+    display: none;
+  }
+
+  .paso__acciones {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
 }

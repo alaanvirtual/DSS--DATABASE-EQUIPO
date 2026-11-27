@@ -18,7 +18,13 @@
     <app-campo-texto etiqueta="Nombre" marcador="p. ej. Ana" [autoenfocar]="true" [(valor)]="nombre" />
     <app-campo-texto etiqueta="Correo" marcador="ana@correo.com" [(valor)]="correo" />
     <app-campo-texto etiqueta="Usuario" marcador="ana" [(valor)]="alias" />
-    <app-campo-texto tipo="password" etiqueta="Contraseña" marcador="••••••" [(valor)]="passw" />
+    <app-campo-texto
+      tipo="password"
+      etiqueta="Contraseña inicial"
+      marcador="Contraseña para su primer acceso"
+      autocompletar="new-password"
+      [(valor)]="passw"
+    />
     <app-campo-select etiqueta="Rol en el proyecto" [opciones]="roles" [(valor)]="rol" />
   }
 

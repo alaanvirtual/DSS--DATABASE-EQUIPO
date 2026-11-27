@@ -1,105 +1,112 @@
 <section class="inicio">
-  <div class="inicio__contexto">
+  <header class="barra">
     <app-campo-select
       etiqueta="Proyecto"
       [opciones]="servicio.opcionesProyectos()"
       [valor]="servicio.idproy()"
+      [deshabilitado]="servicio.proyectos().length === 0"
       (valorChange)="alProyecto($event)"
     />
-    @if (servicio.proyectoActual(); as proyecto) {
-      @if (proyecto.rol; as rol) {
-        <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
-          {{ rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
-        </app-insignia>
-      }
-    }
-    <app-boton variante="secundario" icono="plus" (click)="modalProyecto.set(true)">
+    <app-boton variante="primario" icono="plus" (click)="modalProyecto.set(true)">
       Nuevo proyecto
     </app-boton>
-  </div>
-
-  @if (servicio.proyectoActual()?.objetivo; as objetivo) {
-    <p class="inicio__objetivo">{{ objetivo }}</p>
-  }
+  </header>
 
   @if (servicio.cargando()) {
-    <app-cargando mensaje="Cargando…" />
+    <div class="esqueleto" role="status" aria-busy="true">
+      <span class="solo-lectores">Cargando proyecto…</span>
+      <app-esqueleto alto="9rem" radio="var(--radio-m)" />
+      <div class="paneles">
+        <app-esqueleto alto="22rem" radio="var(--radio-m)" />
+        <app-esqueleto alto="22rem" radio="var(--radio-m)" />
+      </div>
+    </div>
   } @else if (servicio.proyectos().length === 0) {
-    <app-estado-vacio
-      icono="folder-open"
-      titulo="Sin proyectos"
-      descripcion="Crea tu primer proyecto para comenzar la sesión de decisión."
-    >
-      <app-boton variante="primario" icono="plus" (click)="modalProyecto.set(true)">
-        Nuevo proyecto
-      </app-boton>
-    </app-estado-vacio>
+    <div class="vacio">
+      <app-estado-vacio
+        icono="folder-open"
+        titulo="Aún no tienes proyectos"
+        descripcion="Crea tu primer proyecto para comenzar la sesión de decisión, o pídele a un facilitador que te agregue al suyo."
+      >
+        <app-boton variante="primario" icono="plus" (click)="modalProyecto.set(true)">
+          Nuevo proyecto
+        </app-boton>
+      </app-estado-vacio>
+    </div>
   } @else {
-    <div class="inicio__paneles">
-      <section class="inicio__panel">
-        <header class="inicio__panel-cabecera">
-          <h3 class="inicio__panel-titulo">Participantes</h3>
-          @if (servicio.puedeEditar()) {
-            <app-boton
-              variante="fantasma"
-              icono="plus"
-              [soloIcono]="true"
-              etiquetaAria="Agregar participante"
-              (click)="modalParticipante.set(true)"
-            />
+    @if (servicio.proyectoActual(); as proyecto) {
+      <section class="proyecto" [class.proyecto--cerrado]="proyecto.estatus !== 1">
+        <div class="proyecto__cabecera">
+          <h2 class="proyecto__nombre">{{ proyecto.nombre }}</h2>
+          <div class="proyecto__etiquetas">
+            @if (proyecto.rol; as rol) {
+              <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
+                {{ rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
+              </app-insignia>
+            }
+            <app-insignia [variante]="proyecto.estatus === 1 ? 'exito' : 'neutro'">
+              {{ proyecto.estatus === 1 ? 'Activo' : 'Cerrado' }}
+            </app-insignia>
+          </div>
+        </div>
+
+        @if (proyecto.objetivo; as objetivo) {
+          <p class="proyecto__objetivo">{{ objetivo }}</p>
+        }
+
+        <ul class="proyecto__datos">
+          @if (periodo(); as texto) {
+            <li><app-icono nombre="calendar-blank" /> {{ texto }}</li>
           }
-        </header>
-        <ul class="inicio__lista">
-          @for (p of servicio.participantesDetalle(); track p.idusu) {
-            <li class="inicio__elemento">
-              <span class="inicio__herramienta">{{ p.nombre }}</span>
-              <div class="inicio__acciones">
-                <app-insignia [variante]="p.rol === 'FAC' ? 'primario' : 'info'">
-                  {{ p.rol }}
-                </app-insignia>
-                @if (servicio.puedeEditar()) {
-                  <app-boton
-                    variante="fantasma"
-                    icono="x"
-                    [soloIcono]="true"
-                    etiquetaAria="Quitar participante"
-                    (click)="confirmarParticipante.set(p)"
-                  />
-                }
-              </div>
-            </li>
-          }
+          <li>
+            <app-icono nombre="users-three" />
+            {{ servicio.participantesDetalle().length }}
+            {{ servicio.participantesDetalle().length === 1 ? 'participante' : 'participantes' }}
+          </li>
+          <li>
+            <app-icono nombre="list-checks" />
+            {{ servicio.agendaActual().length }}
+            {{ servicio.agendaActual().length === 1 ? 'actividad' : 'actividades' }}
+          </li>
         </ul>
       </section>
+    }
 
-      <section class="inicio__panel">
-        <header class="inicio__panel-cabecera">
-          <h3 class="inicio__panel-titulo">Agenda</h3>
+    <div class="paneles">
+      <section class="panel">
+        <header class="panel__cabecera">
+          <h3 class="panel__titulo"><app-icono nombre="calendar-check" /> Agenda</h3>
           @if (servicio.puedeEditar()) {
-            <app-boton
-              variante="fantasma"
-              icono="plus"
-              [soloIcono]="true"
-              etiquetaAria="Agregar actividad"
-              (click)="modalTopico.set(true)"
-            />
+            <app-boton variante="secundario" icono="plus" (click)="modalTopico.set(true)">
+              Agregar actividad
+            </app-boton>
           }
         </header>
+
         @if (servicio.agendaActual().length === 0) {
           <app-estado-vacio
             icono="calendar-blank"
             titulo="Agenda vacía"
             descripcion="Agrega actividades con su herramienta para armar la reunión."
-          />
+          >
+            @if (servicio.puedeEditar()) {
+              <app-boton variante="primario" icono="plus" (click)="modalTopico.set(true)">
+                Agregar actividad
+              </app-boton>
+            }
+          </app-estado-vacio>
         } @else {
-          <ul class="inicio__lista">
-            @for (entrada of servicio.agendaActual(); track entrada.idtopico) {
-              <li class="inicio__elemento">
-                <div class="inicio__datos">
-                  <span class="inicio__herramienta">{{ entrada.herramienta }}</span>
-                  <span class="inicio__topico">{{ entrada.topico }}</span>
+          <ol class="lista">
+            @for (entrada of servicio.agendaActual(); track entrada.idtopico; let i = $index) {
+              <li class="paso">
+                <span class="paso__numero">{{ i + 1 }}</span>
+                <span class="paso__icono"><app-icono [nombre]="iconoDe(entrada.ruta)" /></span>
+                <div class="paso__datos">
+                  <span class="paso__herramienta">{{ entrada.herramienta }}</span>
+                  <span class="paso__topico">{{ entrada.topico }}</span>
                 </div>
-                <div class="inicio__acciones">
+                <app-insignia variante="neutro">{{ rolDeAgenda(entrada.rol) }}</app-insignia>
+                <div class="paso__acciones">
                   @if (servicio.puedeEditar()) {
                     <app-boton
                       variante="fantasma"
@@ -109,12 +116,48 @@
                       (click)="confirmarTopico.set(entrada)"
                     />
                   }
-                  <app-boton variante="secundario" [routerLink]="['/', entrada.ruta]">Abrir</app-boton>
+                  <app-boton variante="secundario" icono="arrow-right" [routerLink]="['/', entrada.ruta]">
+                    Abrir
+                  </app-boton>
                 </div>
               </li>
             }
-          </ul>
+          </ol>
         }
+      </section>
+
+      <section class="panel">
+        <header class="panel__cabecera">
+          <h3 class="panel__titulo"><app-icono nombre="users-three" /> Participantes</h3>
+          @if (servicio.puedeEditar()) {
+            <app-boton variante="secundario" icono="user-plus" (click)="modalParticipante.set(true)">
+              Agregar
+            </app-boton>
+          }
+        </header>
+
+        <ul class="lista">
+          @for (p of servicio.participantesDetalle(); track p.idusu) {
+            <li class="persona">
+              <span class="persona__avatar" [class.persona__avatar--fac]="p.rol === 'FAC'">
+                {{ iniciales(p.nombre) }}
+              </span>
+              <span class="persona__nombre">{{ p.nombre }}</span>
+              <app-insignia [variante]="p.rol === 'FAC' ? 'primario' : 'info'">
+                {{ p.rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
+              </app-insignia>
+              @if (servicio.puedeEditar()) {
+                <app-boton
+                  variante="fantasma"
+                  icono="x"
+                  [soloIcono]="true"
+                  etiquetaAria="Quitar participante"
+                  (click)="confirmarParticipante.set(p)"
+                />
+              }
+            </li>
+          }
+        </ul>
       </section>
     </div>
   }

@@ -33,6 +33,8 @@ export interface EntradaAgenda {
   topico: string;
   herramienta: string;
   ruta: string;
+  /** Quién participa en la actividad: "FAC", "DEC" o "FAC, DEC". */
+  rol: string;
 }
 
 export interface ParticipanteDetalle {
@@ -82,7 +84,8 @@ export class InicioService {
         idtopico: t.id,
         topico: t.topico,
         herramienta: nombres.get(t.idtool) ?? `Herramienta ${t.idtool}`,
-        ruta: RUTA[t.idtool]
+        ruta: RUTA[t.idtool],
+        rol: t.rol
       }));
   });
 

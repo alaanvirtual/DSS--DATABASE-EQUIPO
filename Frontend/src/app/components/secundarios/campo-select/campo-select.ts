@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { OpcionSelect } from '../../../models/opcion-select';
+import { Icono } from '../icono/icono';
 
 /**
  * Lista desplegable con etiqueta. Soporta enlace bidireccional: [(valor)]="señal".
@@ -7,6 +8,7 @@ import { OpcionSelect } from '../../../models/opcion-select';
  */
 @Component({
   selector: 'app-campo-select',
+  imports: [Icono],
   templateUrl: './campo-select.html',
   styleUrl: './campo-select.css',
   changeDetection: ChangeDetectionStrategy.OnPush
