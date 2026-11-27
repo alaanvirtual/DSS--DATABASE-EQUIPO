@@ -30,8 +30,9 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
       const esLogin = req.url.endsWith('/auth/login');
 
       if (error instanceof ErrorApi && error.estado === 401 && !esLogin) {
+        const volver = router.url;
         auth.salir();
-        void router.navigate(['/login']);
+        void router.navigate(['/login'], { queryParams: { motivo: 'expirada', volver } });
       }
 
       return throwError(() => error);

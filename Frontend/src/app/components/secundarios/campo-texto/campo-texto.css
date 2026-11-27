@@ -14,10 +14,111 @@
   color: var(--color-texto-suave);
 }
 
+.campo__envoltura {
+  position: relative;
+  display: flex;
+}
+
 .campo__control {
+  flex: 1;
+  min-width: 0;
   min-height: 2.5rem;
   padding: 0 var(--espacio-3);
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-s);
+  transition: border-color 0.15s;
+}
+
+.campo__control:hover:not(:disabled) {
+  border-color: var(--color-texto-suave);
+}
+
+/* Foco: borde primario y halo suave (en lugar del contorno azul del navegador). */
+.campo__control:focus-visible {
+  border-color: var(--color-primario);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primario-suave);
+}
+
+.campo__icono {
+  position: absolute;
+  top: 50%;
+  left: var(--espacio-3);
+  display: grid;
+  color: var(--color-texto-suave);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.campo__control--con-icono {
+  padding-left: 2.6rem;
+}
+
+.campo--grande .campo__etiqueta {
+  font-size: 0.85rem;
+  color: var(--color-texto);
+}
+
+.campo--grande .campo__control {
+  min-height: 3rem;
+  font-size: 1rem;
+}
+
+.campo__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Edge trae su propio botón de mostrar contraseña: se oculta para no duplicar el nuestro. */
+.campo__control::-ms-reveal {
+  display: none;
+}
+
+/* Deja espacio al botón de mostrar contraseña. */
+.campo__control--con-accion {
+  padding-right: 2.75rem;
+}
+
+.campo--error .campo__control {
+  border-color: var(--color-acento);
+}
+
+.campo__ojo {
+  position: absolute;
+  top: 50%;
+  right: var(--espacio-1);
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  color: var(--color-texto-suave);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radio-s);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.campo__ojo:hover {
+  color: var(--color-primario);
+  background: var(--color-primario-suave);
+}
+
+.campo__aviso,
+.campo__error {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-1);
+  font-size: 0.8rem;
+}
+
+.campo__aviso {
+  color: var(--color-texto-suave);
+}
+
+.campo__error {
+  font-weight: 600;
+  color: var(--color-acento-oscuro);
 }

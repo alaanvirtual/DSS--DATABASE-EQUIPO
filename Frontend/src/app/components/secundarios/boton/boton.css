@@ -6,6 +6,14 @@
   pointer-events: none;
 }
 
+:host(.bloque) {
+  display: flex;
+}
+
+:host(.bloque) .boton {
+  width: 100%;
+}
+
 .boton {
   display: inline-flex;
   align-items: center;
@@ -27,6 +35,32 @@
 .boton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Cargando: el botón se bloquea pero no se atenúa, para que el spinner se vea bien. */
+.boton[aria-busy='true'] {
+  opacity: 1;
+  cursor: progress;
+}
+
+.boton__rueda {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: boton-girar 0.7s linear infinite;
+}
+
+@keyframes boton-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.boton--grande {
+  min-height: 3rem;
+  font-size: 1rem;
 }
 
 .boton--solo-icono {

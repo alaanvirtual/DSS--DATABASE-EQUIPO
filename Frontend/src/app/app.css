@@ -3,3 +3,8 @@
   max-width: 90rem;
   margin: 0 auto;
 }
+
+/* Sin sesión no hay encabezado: la página (login, 404) ocupa todo el ancho. */
+.contenido--completo {
+  max-width: none;
+}

@@ -5,6 +5,7 @@
   --color-primario-suave: #efe8f6;
   --color-acento: coral; /* #FF7F50 */
   --color-acento-suave: #ffeee7;
+  --color-acento-oscuro: #b8431f; /* texto de error: contraste suficiente sobre blanco */
   --color-exito: teal; /* #008080 */
   --color-exito-suave: #dff1f1;
   --color-aviso: gold; /* #FFD700 */

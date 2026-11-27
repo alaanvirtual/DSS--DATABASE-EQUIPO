@@ -1,0 +1,15 @@
+@if (visible()) {
+  <div class="aviso" role="region" aria-label="Aviso de sesión">
+    <!-- Un solo anuncio para lectores de pantalla; la cuenta regresiva visible no se lee cada segundo. -->
+    <span class="solo-lectores" role="alert">Tu sesión está por vencer. Puedes seguir conectado.</span>
+
+    <app-icono nombre="clock-countdown" tamano="1.6rem" />
+    <p class="aviso__texto" aria-hidden="true">
+      Tu sesión vence en <strong>{{ tiempo() }}</strong>
+    </p>
+    <div class="aviso__acciones">
+      <app-boton variante="primario" [cargando]="renovando()" (click)="renovar()">Seguir conectado</app-boton>
+      <app-boton variante="secundario" [deshabilitado]="renovando()" (click)="salir()">Salir</app-boton>
+    </div>
+  </div>
+}

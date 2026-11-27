@@ -2,11 +2,15 @@
   class="boton"
   [class]="'boton boton--' + variante()"
   [class.boton--solo-icono]="soloIcono()"
+  [class.boton--grande]="grande()"
   [type]="tipo()"
-  [disabled]="deshabilitado()"
+  [disabled]="deshabilitado() || cargando()"
+  [attr.aria-busy]="cargando() ? 'true' : null"
   [attr.aria-label]="etiquetaAria()"
 >
-  @if (icono(); as nombre) {
+  @if (cargando()) {
+    <span class="boton__rueda" aria-hidden="true"></span>
+  } @else if (icono(); as nombre) {
     <app-icono [nombre]="nombre" />
   }
   <ng-content />

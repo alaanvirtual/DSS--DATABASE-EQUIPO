@@ -1,13 +1,49 @@
-<label class="campo">
+<label class="campo" [class.campo--error]="error()" [class.campo--grande]="grande()">
   <span class="campo__etiqueta">{{ etiqueta() }}</span>
-  <input
-    #control
-    class="campo__control"
-    [type]="tipo()"
-    [value]="valor()"
-    [placeholder]="marcador()"
-    [maxLength]="longitudMaxima()"
-    (input)="escribir($event)"
-    (keydown.enter)="enviar.emit()"
-  />
+
+  <span class="campo__envoltura">
+    @if (icono(); as nombre) {
+      <span class="campo__icono" aria-hidden="true"><app-icono [nombre]="nombre" /></span>
+    }
+
+    <input
+      #control
+      class="campo__control"
+      [class.campo__control--con-icono]="icono()"
+      [class.campo__control--con-accion]="tipo() === 'password'"
+      [type]="tipoEfectivo()"
+      [value]="valor()"
+      [placeholder]="marcador()"
+      [maxLength]="longitudMaxima()"
+      [disabled]="deshabilitado()"
+      [attr.autocomplete]="autocompletar()"
+      [attr.aria-invalid]="error() ? 'true' : null"
+      [attr.aria-describedby]="error() ? idError : null"
+      (input)="escribir($event)"
+      (keydown)="alTeclear($event)"
+      (keyup)="alTeclear($event)"
+      (keydown.enter)="enviar.emit()"
+      (blur)="alDesenfocar()"
+    />
+
+    @if (tipo() === 'password') {
+      <button
+        type="button"
+        class="campo__ojo"
+        [attr.aria-label]="verTexto() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        [attr.aria-pressed]="verTexto()"
+        (click)="alternarVisibilidad()"
+      >
+        <app-icono [nombre]="verTexto() ? 'eye-slash' : 'eye'" />
+      </button>
+    }
+  </span>
+
+  @if (mayusculas()) {
+    <span class="campo__aviso"><app-icono nombre="arrow-fat-up" /> Bloq Mayús está activado</span>
+  }
+
+  @if (error(); as mensaje) {
+    <span class="campo__error" [id]="idError" role="alert">{{ mensaje }}</span>
+  }
 </label>
