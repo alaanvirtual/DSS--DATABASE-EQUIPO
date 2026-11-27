@@ -142,15 +142,12 @@ export class InicioService {
 
   /** Crea el proyecto en estatus activo y deja a quien lo creó como facilitador. */
   async crearProyecto(nombre: string, objetivo: string | null): Promise<boolean> {
-    const idusu = this.idusuario;
-    if (idusu === null) return false;
+    if (this.idusuario === null) return false;
 
     return this.mutar(async () => {
+      // El servidor deja a quien crea el proyecto como su facilitador, en la misma operación.
       const creado = await firstValueFrom(
         this.proyectosApi.crear({ nombre, objetivo, fechainicio: null, fechafin: null, estatus: 1 })
-      );
-      await firstValueFrom(
-        this.proyectosApi.agregarParticipante(creado.id, { idusu, rol: 'FAC' })
       );
 
       await this.cargarProyectos(await firstValueFrom(this.proyectosApi.listar()));

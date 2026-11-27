@@ -8,12 +8,14 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { errorApiInterceptor } from './auth/interceptors/error-api.interceptor';
+import { tokenInterceptor } from './auth/interceptors/token.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([errorApiInterceptor]))
+    // El orden importa: tokenInterceptor envuelve a errorApiInterceptor, así que ve el error ya traducido.
+    provideHttpClient(withInterceptors([tokenInterceptor, errorApiInterceptor]))
   ]
 };

@@ -5,12 +5,14 @@ import { environment } from '../auth/environment/environment';
 import { Usuario } from '../models/usuario';
 import { SesionService } from './sesion.service';
 
-const CLAVE = 'dss.usuario';
+const CLAVE_USUARIO = 'dss.usuario';
+const CLAVE_TOKEN = 'dss.token';
 
 /**
  * Usuario autenticado del sistema.
- * Al iniciar sesión sincroniza el identificador con SesionService, de donde
- * leen las herramientas; al salir limpia la sesión completa.
+ * Al iniciar sesión guarda el token (JWT) que el interceptor envía en cada petición y
+ * sincroniza el identificador con SesionService, de donde leen las herramientas;
+ * al salir limpia la sesión completa.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -18,44 +20,59 @@ export class AuthService {
   private readonly sesion = inject(SesionService);
 
   readonly usuario = signal<Usuario | null>(null);
-  readonly autenticado = computed(() => this.usuario() !== null);
+  readonly token = signal<string | null>(null);
+  readonly autenticado = computed(() => this.usuario() !== null && this.token() !== null);
 
   constructor() {
     this.restaurar();
-    effect(() => this.guardar(this.usuario()));
+    effect(() => this.guardar(this.usuario(), this.token()));
   }
 
   async login(credenciales: { usuario: string; passw: string }): Promise<Usuario> {
-    const usuario = await firstValueFrom(
-      this.http.post<Usuario>(`${environment.apiUrl}/auth/login`, credenciales)
+    const respuesta = await firstValueFrom(
+      this.http.post<{ token: string; usuario: Usuario }>(
+        `${environment.apiUrl}/auth/login`,
+        credenciales
+      )
     );
 
-    this.usuario.set(usuario);
-    this.sesion.idusuario.set(usuario.id);
-    return usuario;
+    this.token.set(respuesta.token);
+    this.usuario.set(respuesta.usuario);
+    this.sesion.idusuario.set(respuesta.usuario.id);
+    return respuesta.usuario;
   }
 
   salir(): void {
     this.usuario.set(null);
+    this.token.set(null);
     this.sesion.idproy.set(null);
     this.sesion.idusuario.set(null);
   }
 
   private restaurar(): void {
     try {
-      const crudo = localStorage.getItem(CLAVE);
-      if (!crudo) return;
+      const usuario = localStorage.getItem(CLAVE_USUARIO);
+      const token = localStorage.getItem(CLAVE_TOKEN);
 
-      this.usuario.set(JSON.parse(crudo) as Usuario);
+      // Una sesión sin token (de una versión anterior) no sirve: hay que volver a iniciar.
+      if (!usuario || !token) return;
+
+      this.usuario.set(JSON.parse(usuario) as Usuario);
+      this.token.set(token);
     } catch {
       /* sin almacenamiento disponible: se ignora */
     }
   }
 
-  private guardar(usuario: Usuario | null): void {
+  private guardar(usuario: Usuario | null, token: string | null): void {
     try {
-      if (usuario) localStorage.setItem(CLAVE, JSON.stringify(usuario));
-      else localStorage.removeItem(CLAVE);
+      if (usuario && token) {
+        localStorage.setItem(CLAVE_USUARIO, JSON.stringify(usuario));
+        localStorage.setItem(CLAVE_TOKEN, token);
+      } else {
+        localStorage.removeItem(CLAVE_USUARIO);
+        localStorage.removeItem(CLAVE_TOKEN);
+      }
     } catch {
       /* sin almacenamiento disponible: se ignora */
     }
