@@ -1,0 +1,30 @@
+<div class="esqueleto" role="status" aria-busy="true">
+  <span class="solo-lectores">Cargando tablero…</span>
+
+  <header class="esqueleto__cabecera">
+    <div class="esqueleto__titulos">
+      <app-esqueleto ancho="14rem" alto="1.6rem" />
+      <app-esqueleto ancho="20rem" alto="1rem" />
+    </div>
+    <app-esqueleto ancho="9rem" alto="2.5rem" />
+  </header>
+
+  <div class="esqueleto__cuerpo">
+    <section class="esqueleto__pendientes">
+      <app-esqueleto ancho="10rem" alto="1.2rem" />
+      @for (n of tarjetas; track n) {
+        <app-esqueleto alto="4rem" />
+      }
+    </section>
+
+    <section class="esqueleto__categorias">
+      @for (n of columnas; track n) {
+        <div class="esqueleto__columna">
+          <app-esqueleto ancho="60%" alto="1.2rem" />
+          <app-esqueleto alto="4rem" />
+          <app-esqueleto alto="4rem" />
+        </div>
+      }
+    </section>
+  </div>
+</div>

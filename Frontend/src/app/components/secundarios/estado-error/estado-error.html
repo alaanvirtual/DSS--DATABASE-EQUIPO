@@ -1,0 +1,15 @@
+<div class="error" role="alert">
+  <span class="error__icono">
+    <app-icono [nombre]="icono()" tamano="2.5rem" />
+  </span>
+  <h3 class="error__titulo">{{ titulo() }}</h3>
+  @if (descripcion(); as texto) {
+    <p class="error__texto">{{ texto }}</p>
+  }
+  @if (conAccion()) {
+    <app-boton variante="primario" icono="arrow-clockwise" (click)="reintentar.emit()">
+      {{ textoAccion() }}
+    </app-boton>
+  }
+  <ng-content />
+</div>

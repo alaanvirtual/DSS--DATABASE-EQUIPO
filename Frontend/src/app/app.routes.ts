@@ -12,5 +12,5 @@ export const routes: Routes = [
   { path: 'votacion', title: 'Votación', canActivate: [authGuard], loadComponent: () => import('./views/votacion/votacion').then((m) => m.Votacion) },
   { path: 'ponderacion', title: 'Ponderación', canActivate: [authGuard], loadComponent: () => import('./views/ponderacion/ponderacion').then((m) => m.Ponderacion) },
   { path: 'matriz', title: 'Matriz valuada', canActivate: [authGuard], loadComponent: () => import('./views/matriz/matriz').then((m) => m.Matriz) },
-  { path: '**', redirectTo: 'inicio' }
+  { path: '**', title: 'Página no encontrada', loadComponent: () => import('./views/no-encontrado/no-encontrado').then((m) => m.NoEncontrado) }
 ];
