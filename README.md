@@ -29,7 +29,8 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 │   │   ├── index.ts          # Servidor Express y montaje de routers
 │   │   ├── db/
 │   │   │   ├── schema.ts     # Las 14 tablas como esquema Drizzle
-│   │   │   └── client.ts     # Pool mysql2 + conexión Drizzle
+│   │   │   ├── client.ts     # Pool mysql2 + conexión Drizzle
+│   │   │   └── seed.ts       # Datos de prueba completos (npm run seed -- --yes)
 │   │   ├── crud/             # Factory CRUD reutilizable
 │   │   ├── routes/           # Routers por entidad + scoring
 │   │   └── schemas/          # Validación de entrada con Zod
@@ -66,8 +67,9 @@ Un **SADMG (o DSS - Decision Support System)** es una plataforma de trabajo cola
 │               └── categorizador/ # Vista de la ruta /categorizador
 ├── sql/
 │   ├── 01_schema.sql         # DDL: Creación de BD y las 14 tablas relacionales con PK/FK
-│   ├── 02_seed.sql           # DML: Datos iniciales de prueba (Proyecto "Laptops", usuarios, herramientas)
-│   └── 03_consultas_dss.sql  # DQL: Consultas de verificación, auditoría y cálculo de Scoring final
+│   ├── 02_seed.sql           # Nota: los datos de prueba se cargan con el script del backend (npm run seed)
+│   ├── 03_consultas_dss.sql  # DQL: Consultas de verificación, auditoría y cálculo de Scoring final
+│   └── 04_migracion_esquema.sql  # Migración de una BD con el esquema anterior al actual
 └── README.md                 # Documentación técnica de arquitectura y guía de despliegue
 ```
 
@@ -139,7 +141,7 @@ La URL de la API se configura en `Frontend/src/app/auth/environment/environment.
 2. **`brainstorming`** *(Herramienta 2: Lluvia de Ideas)*:  
    Propuestas abiertas de alternativas y criterios generadas por los decisores (`idproy`, `idtopico`, `idusuario`, `id`, `nombre`, `objetivo`).
 3. **`categorizer`** *(Herramienta 3: Categorizador)*:  
-   Categorías consolidadas por el facilitador (`idproy`, `id`, `nombre`).
+   Categorías consolidadas por el facilitador (`idproy`, `id`, `idtopico`, `nombre`). `idtopico` es el tópico de categorización de la agenda al que pertenece la categoría.
 4. **`categorizerdet`** *(Herramienta 3: Detalle de Categorización)*:  
    Mapeo de ideas individuales asignadas a cada categoría consolidada (`idproy`, `idcat`, `idtopico`, `idusuario`, `ididea`).
 5. **`comenter`** *(Herramienta 4: Comentador)*:  
@@ -163,22 +165,29 @@ La URL de la API se configura en `Frontend/src/app/auth/environment/environment.
 
 ## Guía de Ejecución en MySQL / MariaDB
 
-### Opción A: Desde PowerShell / Bash en una sola línea
+El script `01_schema.sql` no borra nada: si las tablas ya existen, falla. Si tu BD tiene
+el esquema anterior, aplica [`sql/04_migracion_esquema.sql`](sql/04_migracion_esquema.sql).
+
+### Paso 1: crear el esquema (desde PowerShell / Bash)
 
 ```powershell
-mysql -u root -p --default-character-set=utf8mb4 -e "source sql/01_schema.sql; source sql/02_seed.sql; source sql/03_consultas_dss.sql"
+mysql -u root -p --default-character-set=utf8mb4 -e "source sql/01_schema.sql"
 ```
 
-### Opción B: Ejecución paso a paso en consola interactiva de MySQL
+(O ábrelo en la consola de tu cliente SQL, por ejemplo DataGrip, y ejecútalo.)
+
+### Paso 2: cargar los datos de prueba con el script del backend
+
+```bash
+cd backend
+npm run seed -- --yes
+```
+
+Borra y recarga todos los datos de la BD de `DB_NAME`. Ver [`backend/README.md`](backend/README.md#6-datos-de-prueba-seed).
+
+### Paso 3: verificar con las consultas de ejemplo
 
 ```sql
--- 1. Crear el esquema y las 14 tablas
-SOURCE sql/01_schema.sql;
-
--- 2. Insertar los datos semilla de prueba
-SOURCE sql/02_seed.sql;
-
--- 3. Ejecutar las consultas de validación y cálculo de scoring multicriterio
 SOURCE sql/03_consultas_dss.sql;
 ```
 
@@ -202,4 +211,4 @@ WHERE mv.idproy = 1
 GROUP BY alt.id, alt.nombre
 ORDER BY puntaje_scoring_total DESC;
 ```
-*(Produce el ranking recomendado por el sistema: 1° Lenovo, 2° HP, 3° Acer).*
+*(Con los datos del seed produce el ranking: 1° Acer (6.9), 2° HP (5.8), 3° Lenovo (5.7)).*
