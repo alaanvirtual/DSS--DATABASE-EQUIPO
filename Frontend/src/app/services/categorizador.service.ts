@@ -8,9 +8,8 @@ import { Participante } from '../models/participante';
 import { Proyecto } from '../models/proyecto';
 import { Usuario } from '../models/usuario';
 import { claveDeDetalle, claveIdea } from '../utils/clave-idea';
-import { siguienteId } from '../utils/siguiente-id';
+import { DescripcionError, describirError } from '../utils/describir-error';
 import { rolIncluye, topicoOrigen } from '../utils/topico-origen';
-import { BrainstormingService } from './brainstorming.service';
 import { CategoriasService } from './categorias.service';
 import { ProyectosService } from './proyectos.service';
 import { SesionService } from './sesion.service';
@@ -32,7 +31,6 @@ export class CategorizadorService {
   private readonly proyectosApi = inject(ProyectosService);
   private readonly usuariosApi = inject(UsuariosService);
   private readonly categoriasApi = inject(CategoriasService);
-  private readonly brainstormingApi = inject(BrainstormingService);
   private readonly toast = inject(ToastService);
   private readonly sesion = inject(SesionService);
 
@@ -47,12 +45,15 @@ export class CategorizadorService {
 
   // ── Datos del tablero ─────────────────────────────────────────────────
   readonly ideas = signal<Idea[]>([]);
+  /** Categorías del tópico categorizador seleccionado. */
   readonly categorias = signal<Categoria[]>([]);
   readonly detalles = signal<CategoriaDetalle[]>([]);
 
   // ── Estado de carga ───────────────────────────────────────────────────
   readonly cargando = signal(false);
   readonly guardando = signal(false);
+  /** Fallo de la última carga (no de una edición): la pantalla muestra el error con "Reintentar". */
+  readonly errorCarga = signal<DescripcionError | null>(null);
 
   // ── Derivados ─────────────────────────────────────────────────────────
   readonly topicosCategorizador = computed(() =>
@@ -84,19 +85,8 @@ export class CategorizadorService {
     () => new Map(this.ideas().map((i) => [claveIdea(i), i]))
   );
 
-  /**
-   * Las categorías pertenecen al proyecto, no a un tópico (limitación del esquema).
-   * Se muestran las que contienen ideas de este tópico y las que aún están vacías.
-   */
-  readonly categoriasVisibles = computed(() => {
-    const origen = this.topicoOrigenActual()?.id;
-    const detalles = this.detalles();
-
-    return this.categorias().filter((cat) => {
-      const propios = detalles.filter((d) => d.idcat === cat.id);
-      return propios.length === 0 || propios.some((d) => d.idtopico === origen);
-    });
-  });
+  /** Cada categoría pertenece a un tópico, así que ya llegan filtradas por el tópico actual. */
+  readonly categoriasVisibles = computed(() => this.categorias());
 
   readonly columnas = computed<ColumnaCategoria[]>(() => {
     const ideas = this.ideasPorClave();
@@ -125,17 +115,18 @@ export class CategorizadorService {
   // ── Carga ─────────────────────────────────────────────────────────────
 
   async iniciar(): Promise<void> {
-    await this.conCarga(async () => {
-      const [proyectos, usuarios] = await Promise.all([
-        firstValueFrom(this.proyectosApi.listar()),
-        firstValueFrom(this.usuariosApi.listar())
-      ]);
-      this.proyectos.set(proyectos);
-      this.usuarios.set(usuarios);
+    await this.conCarga(() => this.cargarInicial());
+  }
 
-      const inicial = proyectos.find((p) => p.id === this.idproy()) ?? proyectos[0];
-      if (inicial) await this.cargarProyecto(inicial.id);
-    });
+  /** Reintenta la carga que falló: la inicial si aún no hay contexto, o la del proyecto actual. */
+  async reintentar(): Promise<void> {
+    const idproy = this.idproy();
+
+    await this.conCarga(() =>
+      idproy === null || this.proyectos().length === 0
+        ? this.cargarInicial()
+        : this.cargarProyecto(idproy)
+    );
   }
 
   async seleccionarProyecto(idproy: number): Promise<void> {
@@ -155,11 +146,12 @@ export class CategorizadorService {
 
   async crearCategoria(nombre: string): Promise<void> {
     const idproy = this.idproy();
-    if (idproy === null) return;
+    const idtopico = this.idtopico();
+    if (idproy === null || idtopico === null) return;
 
     await this.mutar(async () => {
-      const id = siguienteId(this.categorias());
-      await firstValueFrom(this.categoriasApi.crear(idproy, id, nombre));
+      // El servidor asigna el id de la categoría.
+      await firstValueFrom(this.categoriasApi.crear(idproy, idtopico, nombre));
       await this.cargarTablero();
     }, 'Categoría creada');
   }
@@ -213,10 +205,8 @@ export class CategorizadorService {
             ];
       });
 
-      if (!yaEstaba) await firstValueFrom(this.categoriasApi.asignarIdea(idproy, destino, idea));
-      if (arrastre.origen !== null) {
-        await firstValueFrom(this.categoriasApi.quitarIdea(idproy, arrastre.origen, idea));
-      }
+      // Una sola operación atómica en el servidor: quita la asignación anterior y crea la nueva.
+      await firstValueFrom(this.categoriasApi.moverIdea(idproy, idea, destino));
     });
   }
 
@@ -231,7 +221,7 @@ export class CategorizadorService {
       this.detalles.update((lista) =>
         lista.filter((d) => !(d.idcat === idcat && claveDeDetalle(d) === clave))
       );
-      await firstValueFrom(this.categoriasApi.quitarIdea(idproy, idcat, idea));
+      await firstValueFrom(this.categoriasApi.moverIdea(idproy, idea, null));
     });
   }
 
@@ -244,6 +234,18 @@ export class CategorizadorService {
   }
 
   // ── Internos ──────────────────────────────────────────────────────────
+
+  private async cargarInicial(): Promise<void> {
+    const [proyectos, usuarios] = await Promise.all([
+      firstValueFrom(this.proyectosApi.listar()),
+      firstValueFrom(this.usuariosApi.listar())
+    ]);
+    this.proyectos.set(proyectos);
+    this.usuarios.set(usuarios);
+
+    const inicial = proyectos.find((p) => p.id === this.idproy()) ?? proyectos[0];
+    if (inicial) await this.cargarProyecto(inicial.id);
+  }
 
   private async cargarProyecto(idproy: number): Promise<void> {
     this.sesion.idproy.set(idproy);
@@ -268,39 +270,30 @@ export class CategorizadorService {
 
   private async cargarTablero(): Promise<void> {
     const idproy = this.idproy();
-    const origen = this.topicoOrigenActual();
+    const idtopico = this.idtopico();
 
-    if (idproy === null) {
+    if (idproy === null || idtopico === null) {
       this.ideas.set([]);
       this.categorias.set([]);
       this.detalles.set([]);
       return;
     }
 
-    const [categorias, ideas] = await Promise.all([
-      firstValueFrom(this.categoriasApi.listar(idproy)),
-      origen
-        ? firstValueFrom(this.brainstormingApi.listar(idproy, origen.id))
-        : Promise.resolve([] as Idea[])
-    ]);
+    // Una sola petición trae las ideas, las categorías y las asignaciones del tópico.
+    const datos = await firstValueFrom(this.categoriasApi.cargarTablero(idproy, idtopico));
 
-    const detalles = (
-      await Promise.all(
-        categorias.map((c) => firstValueFrom(this.categoriasApi.listarDetalle(idproy, c.id)))
-      )
-    ).flat();
-
-    this.categorias.set(categorias);
-    this.ideas.set(ideas);
-    this.detalles.set(detalles);
+    this.ideas.set(datos.ideas);
+    this.categorias.set(datos.categorias);
+    this.detalles.set(datos.detalles);
   }
 
   private async conCarga(accion: () => Promise<void>): Promise<void> {
     this.cargando.set(true);
+    this.errorCarga.set(null);
     try {
       await accion();
     } catch (error) {
-      this.reportar(error);
+      this.errorCarga.set(describirError(error));
     } finally {
       this.cargando.set(false);
     }

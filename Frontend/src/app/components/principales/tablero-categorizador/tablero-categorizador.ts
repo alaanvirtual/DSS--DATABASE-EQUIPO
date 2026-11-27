@@ -6,11 +6,12 @@ import { CategorizadorService } from '../../../services/categorizador.service';
 import { leerArrastre } from '../../../utils/arrastre-idea';
 import { claveIdea } from '../../../utils/clave-idea';
 import { ColumnaCategoria } from '../../compuestos/columna-categoria/columna-categoria';
+import { EsqueletoTablero } from '../../compuestos/esqueleto-tablero/esqueleto-tablero';
 import { TarjetaIdea } from '../../compuestos/tarjeta-idea/tarjeta-idea';
 import { ModalConfirmar } from '../../modales/modal-confirmar/modal-confirmar';
 import { ModalNombre } from '../../modales/modal-nombre/modal-nombre';
 import { Boton } from '../../secundarios/boton/boton';
-import { Cargando } from '../../secundarios/cargando/cargando';
+import { EstadoError } from '../../secundarios/estado-error/estado-error';
 import { EstadoVacio } from '../../secundarios/estado-vacio/estado-vacio';
 import { Icono } from '../../secundarios/icono/icono';
 import { Insignia } from '../../secundarios/insignia/insignia';
@@ -23,8 +24,9 @@ import { Insignia } from '../../secundarios/insignia/insignia';
   selector: 'app-tablero-categorizador',
   imports: [
     Boton,
-    Cargando,
     ColumnaCategoria,
+    EsqueletoTablero,
+    EstadoError,
     EstadoVacio,
     Icono,
     Insignia,

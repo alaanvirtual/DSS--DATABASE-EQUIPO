@@ -1,5 +1,8 @@
 @if (servicio.cargando()) {
-<app-cargando mensaje="Cargando tablero…" />
+<app-esqueleto-tablero />
+} @else if (servicio.errorCarga(); as error) {
+<app-estado-error [icono]="error.icono" [titulo]="error.titulo" [descripcion]="error.descripcion"
+  (reintentar)="servicio.reintentar()" />
 } @else if (!servicio.topicoActual()) {
 <app-estado-vacio icono="folder-dashed" titulo="Sin tópico de categorización"
   descripcion="Este proyecto no tiene en su agenda un tópico con la herramienta Categorizador." />
