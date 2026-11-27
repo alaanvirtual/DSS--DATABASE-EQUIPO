@@ -66,3 +66,24 @@ authRouter.get(
     res.json(datosPublicos(encontrado));
   })
 );
+
+// Renueva la sesión: con un token aún vigente entrega uno nuevo, para que el usuario no
+// pierda su trabajo cuando la sesión está por vencer. Un token ya vencido no se renueva.
+authRouter.post(
+  '/refresh',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const [encontrado] = await db
+      .select()
+      .from(usuarios)
+      .where(eq(usuarios.id, usuarioActual(req).id))
+      .limit(1);
+
+    if (!encontrado) throw new ApiError(401, 'La sesión no es válida');
+
+    res.json({
+      token: firmarToken({ id: encontrado.id, usuario: encontrado.usuario }),
+      usuario: datosPublicos(encontrado)
+    });
+  })
+);

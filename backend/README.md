@@ -76,6 +76,7 @@ automáticamente `GET`, `GET /:id`, `POST`, `PATCH /:id` y `DELETE /:id`.
 | --- | --- | --- |
 | POST | `/api/auth/login` | Recibe `{ usuario, passw }` y devuelve `{ token, usuario }` |
 | GET | `/api/auth/me` | Usuario de la sesión actual (requiere token) |
+| POST | `/api/auth/refresh` | Con un token vigente, devuelve `{ token, usuario }` con una vigencia nueva |
 
 Todas las rutas, salvo `/api/health` y `/api/auth/login`, exigen el encabezado
 `Authorization: Bearer <token>`. Quién puede hacer qué: ver la sección 9.
