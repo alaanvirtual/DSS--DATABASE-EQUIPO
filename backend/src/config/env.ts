@@ -18,7 +18,11 @@ const envSchema = z.object({
   DB_USER: z.string().min(1, 'DB_USER es requerido'),
   DB_PASSWORD: z.string(),
   DB_NAME: z.string().min(1).default('dss_sadmg'),
-  DB_SSL: z.enum(['true', 'false']).default('true')
+  DB_SSL: z.enum(['true', 'false']).default('true'),
+  // Secreto con el que se firman los tokens de sesión (JWT). Debe ser largo y privado.
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET debe tener al menos 32 caracteres'),
+  // Vigencia del token: segundos o texto tipo "8h", "7d".
+  JWT_EXPIRES_IN: z.string().min(1).default('8h')
 });
 
 const parsed = envSchema.safeParse(process.env);
