@@ -9,7 +9,8 @@ import { Proyecto } from '../models/proyecto';
 import { Usuario } from '../models/usuario';
 import { claveDeDetalle, claveIdea } from '../utils/clave-idea';
 import { DescripcionError, describirError } from '../utils/describir-error';
-import { rolIncluye, topicoOrigen } from '../utils/topico-origen';
+import { topicoOrigen } from '../utils/topico-origen';
+import { AuthService } from './auth.service';
 import { CategoriasService } from './categorias.service';
 import { ProyectosService } from './proyectos.service';
 import { SesionService } from './sesion.service';
@@ -32,6 +33,7 @@ export class CategorizadorService {
   private readonly usuariosApi = inject(UsuariosService);
   private readonly categoriasApi = inject(CategoriasService);
   private readonly toast = inject(ToastService);
+  private readonly auth = inject(AuthService);
   private readonly sesion = inject(SesionService);
 
   // ── Contexto ──────────────────────────────────────────────────────────
@@ -41,13 +43,21 @@ export class CategorizadorService {
   readonly agenda = signal<TopicoAgenda[]>([]);
   readonly idtopico = signal<number | null>(null);
   readonly idproy = this.sesion.idproy.asReadonly();
-  readonly idusuario = this.sesion.idusuario.asReadonly();
+  /** Usuario autenticado: es quien actúa (ya no se elige otro). */
+  readonly idusuario = computed(() => this.auth.usuario()?.id ?? null);
 
   // ── Datos del tablero ─────────────────────────────────────────────────
   readonly ideas = signal<Idea[]>([]);
   /** Categorías del tópico categorizador seleccionado. */
   readonly categorias = signal<Categoria[]>([]);
   readonly detalles = signal<CategoriaDetalle[]>([]);
+
+  /**
+   * Si el usuario autenticado puede editar el tópico. Lo decide el servidor (es facilitador
+   * del proyecto y la agenda lo permite), así la vista nunca contradice lo que la API acepta.
+   */
+  private readonly puedeEditarServidor = signal(false);
+  readonly puedeEditar = this.puedeEditarServidor.asReadonly();
 
   // ── Estado de carga ───────────────────────────────────────────────────
   readonly cargando = signal(false);
@@ -70,12 +80,6 @@ export class CategorizadorService {
   readonly rolActual = computed(
     () => this.participantes().find((p) => p.idusu === this.idusuario())?.rol ?? null
   );
-
-  /** Solo el facilitador edita, y solo si la agenda del tópico lo permite. */
-  readonly puedeEditar = computed(() => {
-    const topico = this.topicoActual();
-    return this.rolActual() === 'FAC' && !!topico && rolIncluye(topico.rol, 'FAC');
-  });
 
   private readonly nombresUsuarios = computed(
     () => new Map(this.usuarios().map((u) => [u.id, u.nombre]))
@@ -131,10 +135,6 @@ export class CategorizadorService {
 
   async seleccionarProyecto(idproy: number): Promise<void> {
     await this.conCarga(() => this.cargarProyecto(idproy));
-  }
-
-  seleccionarUsuario(idusuario: number): void {
-    this.sesion.idusuario.set(idusuario);
   }
 
   async seleccionarTopico(idtopico: number): Promise<void> {
@@ -257,11 +257,6 @@ export class CategorizadorService {
     this.participantes.set(participantes);
     this.agenda.set(agenda);
 
-    if (!participantes.some((p) => p.idusu === this.idusuario())) {
-      const preferido = participantes.find((p) => p.rol === 'FAC') ?? participantes[0];
-      this.sesion.idusuario.set(preferido?.idusu ?? null);
-    }
-
     const topicos = this.topicosCategorizador();
     this.idtopico.set((topicos.find((t) => t.id === this.idtopico()) ?? topicos[0])?.id ?? null);
 
@@ -276,6 +271,7 @@ export class CategorizadorService {
       this.ideas.set([]);
       this.categorias.set([]);
       this.detalles.set([]);
+      this.puedeEditarServidor.set(false);
       return;
     }
 
@@ -285,6 +281,7 @@ export class CategorizadorService {
     this.ideas.set(datos.ideas);
     this.categorias.set(datos.categorias);
     this.detalles.set(datos.detalles);
+    this.puedeEditarServidor.set(datos.puedeEditar);
   }
 
   private async conCarga(accion: () => Promise<void>): Promise<void> {
