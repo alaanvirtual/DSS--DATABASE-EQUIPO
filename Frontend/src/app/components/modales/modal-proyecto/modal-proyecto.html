@@ -1,0 +1,13 @@
+<app-modal [titulo]="titulo()" (cerrar)="cancelar.emit()">
+  <app-campo-texto etiqueta="Nombre" marcador="p. ej. Laptops" [autoenfocar]="true" [(valor)]="nombre" />
+  <app-campo-texto
+    etiqueta="Objetivo (opcional)"
+    marcador="¿Qué se va a decidir?"
+    [longitudMaxima]="1000"
+    [(valor)]="objetivo"
+  />
+  <div pie>
+    <app-boton variante="fantasma" (click)="cancelar.emit()">Cancelar</app-boton>
+    <app-boton variante="primario" [deshabilitado]="!valido()" (click)="confirmar()">Crear</app-boton>
+  </div>
+</app-modal>

@@ -1,0 +1,40 @@
+<app-modal [titulo]="titulo()" (cerrar)="cancelar.emit()">
+  @if (modo() === 'elegir') {
+    @if (hayUsuarios()) {
+      <app-campo-select etiqueta="Usuario" [opciones]="usuarios()" [(valor)]="idusu" />
+    } @else {
+      <app-estado-vacio
+        icono="users-three"
+        titulo="Ya están todos"
+        descripcion="Todos los usuarios del sistema participan en este proyecto."
+      >
+        <app-boton variante="primario" icono="plus" (click)="modo.set('crear')">
+          Registrar usuario nuevo
+        </app-boton>
+      </app-estado-vacio>
+    }
+    <app-campo-select etiqueta="Rol en el proyecto" [opciones]="roles" [(valor)]="rol" />
+  } @else {
+    <app-campo-texto etiqueta="Nombre" marcador="p. ej. Ana" [autoenfocar]="true" [(valor)]="nombre" />
+    <app-campo-texto etiqueta="Correo" marcador="ana@correo.com" [(valor)]="correo" />
+    <app-campo-texto etiqueta="Usuario" marcador="ana" [(valor)]="alias" />
+    <app-campo-texto tipo="password" etiqueta="Contraseña" marcador="••••••" [(valor)]="passw" />
+    <app-campo-select etiqueta="Rol en el proyecto" [opciones]="roles" [(valor)]="rol" />
+  }
+
+  @if (modo() === 'elegir' && hayUsuarios()) {
+    <div pie>
+      <app-boton variante="fantasma" (click)="cancelar.emit()">Cancelar</app-boton>
+      <app-boton variante="primario" [deshabilitado]="!validoElegir()" (click)="confirmar()">
+        Agregar
+      </app-boton>
+    </div>
+  } @else if (modo() === 'crear') {
+    <div pie>
+      <app-boton variante="fantasma" (click)="modo.set('elegir')">Volver</app-boton>
+      <app-boton variante="primario" [deshabilitado]="!validoCrear()" (click)="confirmar()">
+        Crear y agregar
+      </app-boton>
+    </div>
+  }
+</app-modal>

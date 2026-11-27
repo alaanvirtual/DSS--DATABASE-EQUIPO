@@ -1,0 +1,165 @@
+<section class="inicio">
+  <div class="inicio__contexto">
+    <app-campo-select
+      etiqueta="Proyecto"
+      [opciones]="servicio.opcionesProyectos()"
+      [valor]="servicio.idproy()"
+      (valorChange)="alProyecto($event)"
+    />
+    @if (servicio.proyectoActual(); as proyecto) {
+      @if (proyecto.rol; as rol) {
+        <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
+          {{ rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
+        </app-insignia>
+      }
+    }
+    <app-boton variante="secundario" icono="plus" (click)="modalProyecto.set(true)">
+      Nuevo proyecto
+    </app-boton>
+  </div>
+
+  @if (servicio.proyectoActual()?.objetivo; as objetivo) {
+    <p class="inicio__objetivo">{{ objetivo }}</p>
+  }
+
+  @if (servicio.cargando()) {
+    <app-cargando mensaje="Cargando…" />
+  } @else if (servicio.proyectos().length === 0) {
+    <app-estado-vacio
+      icono="folder-open"
+      titulo="Sin proyectos"
+      descripcion="Crea tu primer proyecto para comenzar la sesión de decisión."
+    >
+      <app-boton variante="primario" icono="plus" (click)="modalProyecto.set(true)">
+        Nuevo proyecto
+      </app-boton>
+    </app-estado-vacio>
+  } @else {
+    <div class="inicio__paneles">
+      <section class="inicio__panel">
+        <header class="inicio__panel-cabecera">
+          <h3 class="inicio__panel-titulo">Participantes</h3>
+          @if (servicio.puedeEditar()) {
+            <app-boton
+              variante="fantasma"
+              icono="plus"
+              [soloIcono]="true"
+              etiquetaAria="Agregar participante"
+              (click)="modalParticipante.set(true)"
+            />
+          }
+        </header>
+        <ul class="inicio__lista">
+          @for (p of servicio.participantesDetalle(); track p.idusu) {
+            <li class="inicio__elemento">
+              <span class="inicio__herramienta">{{ p.nombre }}</span>
+              <div class="inicio__acciones">
+                <app-insignia [variante]="p.rol === 'FAC' ? 'primario' : 'info'">
+                  {{ p.rol }}
+                </app-insignia>
+                @if (servicio.puedeEditar()) {
+                  <app-boton
+                    variante="fantasma"
+                    icono="x"
+                    [soloIcono]="true"
+                    etiquetaAria="Quitar participante"
+                    (click)="confirmarParticipante.set(p)"
+                  />
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="inicio__panel">
+        <header class="inicio__panel-cabecera">
+          <h3 class="inicio__panel-titulo">Agenda</h3>
+          @if (servicio.puedeEditar()) {
+            <app-boton
+              variante="fantasma"
+              icono="plus"
+              [soloIcono]="true"
+              etiquetaAria="Agregar actividad"
+              (click)="modalTopico.set(true)"
+            />
+          }
+        </header>
+        @if (servicio.agendaActual().length === 0) {
+          <app-estado-vacio
+            icono="calendar-blank"
+            titulo="Agenda vacía"
+            descripcion="Agrega actividades con su herramienta para armar la reunión."
+          />
+        } @else {
+          <ul class="inicio__lista">
+            @for (entrada of servicio.agendaActual(); track entrada.idtopico) {
+              <li class="inicio__elemento">
+                <div class="inicio__datos">
+                  <span class="inicio__herramienta">{{ entrada.herramienta }}</span>
+                  <span class="inicio__topico">{{ entrada.topico }}</span>
+                </div>
+                <div class="inicio__acciones">
+                  @if (servicio.puedeEditar()) {
+                    <app-boton
+                      variante="fantasma"
+                      icono="trash"
+                      [soloIcono]="true"
+                      etiquetaAria="Eliminar actividad"
+                      (click)="confirmarTopico.set(entrada)"
+                    />
+                  }
+                  <app-boton variante="secundario" [routerLink]="['/', entrada.ruta]">Abrir</app-boton>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  }
+</section>
+
+@if (modalProyecto()) {
+  <app-modal-proyecto
+    titulo="Nuevo proyecto"
+    (guardar)="alCrearProyecto($event)"
+    (cancelar)="modalProyecto.set(false)"
+  />
+}
+@if (modalParticipante()) {
+  <app-modal-participante
+    titulo="Agregar participante"
+    [usuarios]="servicio.usuariosDisponibles()"
+    (guardar)="alAgregarParticipante($event)"
+    (cancelar)="modalParticipante.set(false)"
+  />
+}
+@if (modalTopico()) {
+  <app-modal-topico
+    titulo="Agregar actividad"
+    [herramientas]="servicio.opcionesHerramientas()"
+    (guardar)="alAgregarTopico($event)"
+    (cancelar)="modalTopico.set(false)"
+  />
+}
+@if (confirmarParticipante(); as p) {
+  <app-modal-confirmar
+    titulo="Quitar participante"
+    [mensaje]="'¿Quitar a ' + p.nombre + ' del proyecto?'"
+    textoConfirmar="Quitar"
+    [peligro]="true"
+    (confirmar)="alConfirmarParticipante()"
+    (cancelar)="confirmarParticipante.set(null)"
+  />
+}
+@if (confirmarTopico(); as t) {
+  <app-modal-confirmar
+    titulo="Eliminar actividad"
+    [mensaje]="'Se eliminará «' + t.topico + '» junto con su chat, ideas y valoraciones. ¿Continuar?'"
+    textoConfirmar="Eliminar"
+    [peligro]="true"
+    (confirmar)="alConfirmarTopico()"
+    (cancelar)="confirmarTopico.set(null)"
+  />
+}

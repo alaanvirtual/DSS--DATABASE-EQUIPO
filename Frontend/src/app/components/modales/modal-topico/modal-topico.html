@@ -1,0 +1,9 @@
+<app-modal [titulo]="titulo()" (cerrar)="cancelar.emit()">
+  <app-campo-texto etiqueta="Actividad" marcador="p. ej. definir ideas de alternativas" [autoenfocar]="true" [(valor)]="topico" />
+  <app-campo-select etiqueta="Herramienta" [opciones]="herramientas()" [(valor)]="idtool" />
+  <app-campo-select etiqueta="¿Quién participa?" [opciones]="rolesAgenda" [(valor)]="rol" />
+  <div pie>
+    <app-boton variante="fantasma" (click)="cancelar.emit()">Cancelar</app-boton>
+    <app-boton variante="primario" [deshabilitado]="!valido()" (click)="confirmar()">Agregar</app-boton>
+  </div>
+</app-modal>

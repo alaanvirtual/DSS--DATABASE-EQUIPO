@@ -18,6 +18,7 @@ import {
 })
 export class CampoTexto {
   readonly etiqueta = input.required<string>();
+  readonly tipo = input<'text' | 'password'>('text');
   readonly marcador = input('');
   readonly longitudMaxima = input(100);
   readonly autoenfocar = input(false);

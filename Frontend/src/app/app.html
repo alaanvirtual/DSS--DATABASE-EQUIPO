@@ -1,7 +1,12 @@
 <app-encabezado
   titulo="SADMG · DSS"
   subtitulo="Sistema de apoyo a la decisión multicriterio"
-/>
+>
+  @if (auth.usuario(); as usuario) {
+    <app-insignia variante="info">{{ usuario.nombre }}</app-insignia>
+    <app-boton variante="secundario" icono="sign-out" (click)="salir()">Salir</app-boton>
+  }
+</app-encabezado>
 <main class="contenido">
   <router-outlet />
 </main>

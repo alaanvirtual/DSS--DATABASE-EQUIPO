@@ -22,4 +22,8 @@ export class UsuariosService {
       )
     );
   }
+
+  crear(datos: { nombre: string; correo: string; usuario: string; passw: string }): Observable<Usuario> {
+    return this.http.post<Usuario>(`${environment.apiUrl}/usuarios`, datos);
+  }
 }

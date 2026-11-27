@@ -1,0 +1,33 @@
+<section class="login">
+  <div class="login__tarjeta">
+    <h2 class="login__titulo">Iniciar sesión</h2>
+    <p class="login__descripcion">Ingresa con tu usuario del sistema para participar en los proyectos.</p>
+
+    <app-campo-texto
+      etiqueta="Usuario"
+      marcador="tu usuario"
+      [autoenfocar]="true"
+      [(valor)]="usuario"
+      (enviar)="entrar()"
+    />
+    <app-campo-texto
+      tipo="password"
+      etiqueta="Contraseña"
+      marcador="••••••"
+      [(valor)]="passw"
+      (enviar)="entrar()"
+    />
+
+    @if (error(); as mensaje) {
+      <p class="login__error" role="alert">{{ mensaje }}</p>
+    }
+
+    <app-boton
+      variante="primario"
+      [deshabilitado]="enviando() || !usuario().trim() || !passw()"
+      (click)="entrar()"
+    >
+      @if (enviando()) { Entrando… } @else { Entrar }
+    </app-boton>
+  </div>
+</section>

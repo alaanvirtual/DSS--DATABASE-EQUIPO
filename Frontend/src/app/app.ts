@@ -1,12 +1,24 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { Encabezado } from './components/principales/encabezado/encabezado';
 import { Notificaciones } from './components/principales/notificaciones/notificaciones';
+import { Boton } from './components/secundarios/boton/boton';
+import { Insignia } from './components/secundarios/insignia/insignia';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Encabezado, Notificaciones],
+  imports: [RouterOutlet, Encabezado, Notificaciones, Boton, Insignia],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {}
+export class App {
+  private readonly router = inject(Router);
+
+  readonly auth = inject(AuthService);
+
+  salir(): void {
+    this.auth.salir();
+    void this.router.navigate(['/login']);
+  }
+}

@@ -3,6 +3,7 @@ import cors from 'cors';
 import { env } from './config/env';
 import { pool } from './db/client';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler';
+import { authRouter } from './routes/auth';
 import { healthRouter } from './routes/health';
 import { scoringRouter } from './routes/scoring';
 import {
@@ -36,6 +37,7 @@ export function createApp() {
   });
 
   app.use('/api/health', healthRouter);
+  app.use('/api/auth', authRouter);
 
   app.use('/api/usuarios', usuariosRouter);
   app.use('/api/tools', toolsRouter);

@@ -134,3 +134,8 @@ export const votingCreate = z.object({
 export const votingUpdate = z.object({
   voto: z.coerce.number().finite().min(0).max(100)
 });
+
+export const loginSchema = z.object({
+  usuario: z.string().min(1).max(100),
+  passw: z.string().min(1).max(100)
+});
