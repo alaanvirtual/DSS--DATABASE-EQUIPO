@@ -1,0 +1,16 @@
+<label class="campo">
+  <span class="campo__cabecera">
+    <span class="campo__etiqueta">{{ etiqueta() }}</span>
+    <span class="campo__contador">{{ valor().length }} / {{ longitudMaxima() }}</span>
+  </span>
+  <textarea
+    #control
+    class="campo__control"
+    [rows]="filas()"
+    [value]="valor()"
+    [placeholder]="marcador()"
+    [maxLength]="longitudMaxima()"
+    (input)="escribir($event)"
+    (keydown)="alTecla($event)"
+  ></textarea>
+</label>

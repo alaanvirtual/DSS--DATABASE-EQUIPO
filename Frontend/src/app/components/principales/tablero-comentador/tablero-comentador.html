@@ -1,0 +1,100 @@
+@if (servicio.cargando()) {
+  <app-esqueleto-tablero />
+} @else if (servicio.errorCarga(); as error) {
+  <app-estado-error
+    [icono]="error.icono"
+    [titulo]="error.titulo"
+    [descripcion]="error.descripcion"
+    (reintentar)="servicio.reintentar()"
+  />
+} @else if (!servicio.topicoActual()) {
+  <app-estado-vacio
+    icono="chat-circle-text"
+    titulo="Sin tópico de comentarios"
+    descripcion="Este proyecto no tiene en su agenda un tópico con la herramienta Comentador."
+  />
+} @else if (!servicio.topicoCategorizadorActual()) {
+  <app-estado-vacio
+    icono="folder-dashed"
+    titulo="Sin categorizador previo"
+    descripcion="Este tópico necesita un tópico de Categorizador anterior en la agenda para mostrar sus categorías."
+  />
+} @else {
+  <section class="tablero">
+    <header class="tablero__cabecera">
+      <div>
+        <h2 class="tablero__titulo">{{ servicio.topicoActual()?.topico }}</h2>
+        @if (servicio.topicoCategorizadorActual(); as categorizador) {
+          <p class="tablero__origen">
+            Comentando las categorías de: <strong>{{ categorizador.topico }}</strong>
+          </p>
+        }
+      </div>
+
+      <div class="tablero__estado">
+        @if (servicio.puedeComentar()) {
+          @if (servicio.resumenProgreso(); as progreso) {
+            @if (progreso.total > 0) {
+              <app-insignia
+                [variante]="progreso.comentadas === progreso.total ? 'exito' : 'info'"
+              >
+                <app-icono nombre="chat-circle-text" />
+                {{ progreso.comentadas }} / {{ progreso.total }} comentadas
+              </app-insignia>
+            }
+          }
+        } @else {
+          <app-insignia variante="aviso">
+            <app-icono nombre="lock-simple" /> Solo lectura
+          </app-insignia>
+        }
+      </div>
+    </header>
+
+    @if (servicio.tarjetas().length === 0) {
+      <app-estado-vacio
+        icono="squares-four"
+        titulo="Aún no hay categorías para comentar"
+        descripcion="El facilitador debe crear y agrupar categorías en el Categorizador antes de comentar."
+      />
+    } @else {
+      <section class="categorias">
+        @for (tarjeta of servicio.tarjetas(); track tarjeta.categoria.id) {
+          <app-tarjeta-comentarios
+            [tarjeta]="tarjeta"
+            [editable]="servicio.puedeComentar()"
+            [deshabilitado]="servicio.guardando()"
+            (comentar)="comentando.set(tarjeta)"
+            (eliminarPropio)="eliminando.set(tarjeta)"
+          />
+        }
+      </section>
+    }
+  </section>
+}
+
+@if (comentando(); as tarjeta) {
+  <app-modal-comentario
+    [titulo]="
+      (tarjeta.comentarioPropio ? 'Editar comentario en «' : 'Comentar en «') +
+      tarjeta.categoria.nombre +
+      '»'
+    "
+    etiqueta="Tu comentario"
+    [valorInicial]="tarjeta.comentarioPropio?.comentario ?? ''"
+    [textoGuardar]="tarjeta.comentarioPropio ? 'Guardar cambios' : 'Publicar'"
+    (guardar)="guardar($event)"
+    (cancelar)="comentando.set(null)"
+  />
+}
+
+@if (eliminando(); as tarjeta) {
+  <app-modal-confirmar
+    titulo="Eliminar comentario"
+    [mensaje]="'¿Eliminar tu comentario en la categoría «' + tarjeta.categoria.nombre + '»?'"
+    textoConfirmar="Eliminar"
+    [peligro]="true"
+    (confirmar)="eliminar()"
+    (cancelar)="eliminando.set(null)"
+  />
+}

@@ -1,0 +1,86 @@
+<article class="categoria">
+  <header class="categoria__cabecera">
+    <h3 class="categoria__titulo">{{ tarjeta().categoria.nombre }}</h3>
+    <div class="categoria__estados">
+      @if (tarjeta().comentarioPropio) {
+        <app-insignia variante="exito">
+          <app-icono nombre="check-circle" /> Comentado
+        </app-insignia>
+      }
+      <app-insignia variante="primario">
+        <app-icono nombre="chat-circle-text" /> {{ tarjeta().comentarios.length }}
+      </app-insignia>
+    </div>
+  </header>
+
+  @if (tarjeta().ideas.length > 0) {
+    <section class="categoria__bloque">
+      <p class="categoria__subtitulo">Ideas agrupadas ({{ tarjeta().ideas.length }})</p>
+      <div class="categoria__ideas">
+        @for (idea of tarjeta().ideas; track claveIdea(idea)) {
+          <app-tarjeta-idea [idea]="idea" variante="compacta" [editable]="false" />
+        }
+      </div>
+    </section>
+  }
+
+  <section class="categoria__bloque categoria__bloque--comentarios">
+    <p class="categoria__subtitulo">Comentarios</p>
+    <div class="categoria__lista">
+      @for (item of tarjeta().comentarios; track item.idusuario) {
+        <div class="comentario" [class.comentario--propio]="item.esPropio">
+          <header class="comentario__cabecera">
+            <div class="comentario__autor">
+              <strong class="comentario__nombre">{{ item.autor }}</strong>
+              @if (item.rol; as rol) {
+                <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
+                  {{ rol }}
+                </app-insignia>
+              }
+              @if (item.esPropio) {
+                <app-insignia variante="exito">Tú</app-insignia>
+              }
+            </div>
+
+            @if (item.esPropio && editable()) {
+              <div class="comentario__acciones">
+                <app-boton
+                  variante="fantasma"
+                  icono="pencil-simple"
+                  [soloIcono]="true"
+                  [deshabilitado]="deshabilitado()"
+                  etiquetaAria="Editar mi comentario"
+                  (click)="comentar.emit()"
+                />
+                <app-boton
+                  variante="fantasma"
+                  icono="trash"
+                  [soloIcono]="true"
+                  [deshabilitado]="deshabilitado()"
+                  etiquetaAria="Eliminar mi comentario"
+                  (click)="eliminarPropio.emit()"
+                />
+              </div>
+            }
+          </header>
+          <p class="comentario__texto">{{ item.comentario }}</p>
+        </div>
+      } @empty {
+        <p class="categoria__vacia">Aún no hay comentarios para esta categoría.</p>
+      }
+    </div>
+  </section>
+
+  @if (editable()) {
+    <footer class="categoria__pie">
+      <app-boton
+        [variante]="tarjeta().comentarioPropio ? 'secundario' : 'primario'"
+        [icono]="tarjeta().comentarioPropio ? 'pencil-simple' : 'chat-circle-text'"
+        [deshabilitado]="deshabilitado()"
+        (click)="comentar.emit()"
+      >
+        {{ tarjeta().comentarioPropio ? 'Editar mi comentario' : 'Agregar comentario' }}
+      </app-boton>
+    </footer>
+  }
+</article>

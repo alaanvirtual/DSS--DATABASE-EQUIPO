@@ -1,0 +1,15 @@
+<app-modal [titulo]="titulo()" (cerrar)="cancelar.emit()">
+  <app-campo-area
+    [etiqueta]="etiqueta()"
+    [marcador]="marcador()"
+    [autoenfocar]="true"
+    [(valor)]="texto"
+    (enviar)="confirmar()"
+  />
+  <div pie>
+    <app-boton variante="fantasma" (click)="cancelar.emit()">Cancelar</app-boton>
+    <app-boton variante="primario" [deshabilitado]="!valido()" (click)="confirmar()">
+      {{ textoGuardar() }}
+    </app-boton>
+  </div>
+</app-modal>

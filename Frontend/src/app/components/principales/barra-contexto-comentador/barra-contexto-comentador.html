@@ -1,0 +1,20 @@
+<div class="contexto">
+  <app-campo-select
+    etiqueta="Proyecto"
+    [opciones]="proyectos()"
+    [valor]="servicio.idproy()"
+    (valorChange)="alProyecto($event)"
+  />
+  <app-campo-select
+    etiqueta="Tópico de comentarios"
+    [opciones]="topicos()"
+    [valor]="servicio.idtopico()"
+    [deshabilitado]="topicos().length === 0"
+    (valorChange)="alTopico($event)"
+  />
+  @if (servicio.rolActual(); as rol) {
+    <app-insignia [variante]="rol === 'FAC' ? 'primario' : 'info'">
+      {{ rol === 'FAC' ? 'Facilitador' : 'Decisor' }}
+    </app-insignia>
+  }
+</div>
