@@ -12,6 +12,11 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  connectTimeout: 10_000,
+  // TiDB Cloud corta las conexiones inactivas: se mantienen vivas y las ociosas se liberan antes.
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10_000,
+  idleTimeout: 60_000,
   dateStrings: true,
   ssl: env.ssl ? { minVersion: 'TLSv1.2' } : undefined
 });

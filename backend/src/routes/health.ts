@@ -23,9 +23,9 @@ healthRouter.get(
         tables_count: Number(rows[0]?.total ?? 0)
       });
     } catch (error) {
-      throw new ApiError(500, 'No se pudo conectar a la base de datos', {
-        cause: error instanceof Error ? error.message : String(error)
-      });
+      // El detalle del fallo solo se registra en el servidor: no se expone al cliente.
+      console.error('Health check falló:', error);
+      throw new ApiError(503, 'No se pudo conectar a la base de datos');
     }
   })
 );
